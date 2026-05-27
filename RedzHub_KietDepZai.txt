@@ -1,0 +1,190 @@
+-- ========================================================================
+--          REDZ HUB CHUẨN 100% THEO ẢNH TRONG TIKTOK (BY KIETDEPZAI)
+--          Môi trường chạy: Hỗ trợ tất cả các Executor trên Điện thoại & PC
+-- ========================================================================
+
+local P, UIS, TS = game:GetService("Players"), game:GetService("UserInputService"), game:GetService("TweenService")
+local LP = P.LocalPlayer
+if game.CoreGui:FindFirstChild("RedzKietPro") then game.CoreGui.RedzKietPro:Destroy() end
+
+getgenv().Cfg = {
+    Farm = false,
+    Near = false,
+    Marine = false,
+    Bone = false,
+    Soul = false,
+    Surprise = false,
+    Mastery = false,
+    SelectedWp = "Melee",
+    SelectedIsland = "Chưa chọn",
+    SelectedStat = "Melee",
+    AutoStats = false,
+    TeleportIsland = false
+}
+
+-- [1. TẠO KHUNG GIAO DIỆN CHUẨN STYLE REDZ HUB TRONG ẢNH]
+local SG = Instance.new("ScreenGui", game.CoreGui); SG.Name = "RedzKietPro"
+local Main = Instance.new("Frame", SG); Main.Size = UDim2.new(0, 520, 0, 350); Main.Position = UDim2.new(0.5, -260, 0.5, -175); Main.BackgroundColor3 = Color3.fromRGB(18, 18, 22); Main.BorderSizePixel = 0; Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
+local Bar = Instance.new("Frame", Main); Bar.Size = UDim2.new(1, 0, 0, 38); Bar.BackgroundColor3 = Color3.fromRGB(24, 24, 28); Bar.BorderSizePixel = 0; Instance.new("UICorner", Bar).CornerRadius = UDim.new(0, 8)
+
+local Ttl = Instance.new("TextLabel", Bar); Ttl.Size = UDim2.new(0, 350, 1, 0); Ttl.Position = UDim2.new(0, 15); Ttl.Text = "redz Hub [ BETA ACCESS ] : Blox Fruits"; Ttl.TextColor3 = Color3.fromRGB(215, 215, 220); Ttl.Font = Enum.Font.GothamBold; Ttl.TextSize = 12; Ttl.TextXAlignment = Enum.TextXAlignment.Left; Ttl.BackgroundTransparency = 1
+local Cls = Instance.new("TextButton", Bar); Cls.Size = UDim2.new(0, 30, 0, 30); Cls.Position = UDim2.new(1, -35, 0, 4); Cls.Text = "×"; Cls.TextColor3 = Color3.fromRGB(255, 80, 80); Cls.BackgroundTransparency = 1; Cls.TextSize = 22; Cls.MouseButton1Click:Connect(function() SG:Destroy() end)
+local Min = Instance.new("TextButton", Bar); Min.Size = UDim2.new(0, 30, 0, 30); Min.Position = UDim2.new(1, -65, 0, 4); Min.Text = "−"; Min.TextColor3 = Color3.fromRGB(180, 180, 180); Min.BackgroundTransparency = 1; Min.TextSize = 20
+
+-- Hệ thống xử lý kéo thả giao diện mượt mà
+local drag, dInput, dStart, sPos
+Bar.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then drag = true; dStart = i.Position; sPos = Main.Position; i.Changed:Connect(function() if i.UserInputState == Enum.UserInputState.End then drag = false end end) end end)
+Bar.InputChanged:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseMovement then dInput = i end end)
+UIS.InputChanged:Connect(function(i) if i == dInput and drag then local d = i.Position - dStart; Main.Position = UDim2.new(sPos.X.Scale, sPos.X.Offset + d.X, sPos.Y.Scale, sPos.Y.Offset + d.Y) end end)
+
+-- Nút Thu nhỏ / Mở rộng menu cực tiện lợi
+local Minimized = false
+Min.MouseButton1Click:Connect(function()
+    Minimized = not Minimized
+    TS:Create(Main, TweenInfo.new(0.2), {Size = Minimized and UDim2.new(0, 520, 0, 38) or UDim2.new(0, 520, 0, 350)}):Play()
+    Main.Side.Visible = not Minimized
+    Main.Area.Visible = not Minimized
+end)
+
+-- Tạo cấu trúc khu vực Sidebar trái và vùng Content phải
+local Side = Instance.new("Frame", Main); Side.Name = "Side"; Side.Size = UDim2.new(0, 130, 1, -38); Side.Position = UDim2.new(0, 0, 0, 38); Side.BackgroundColor3 = Color3.fromRGB(14, 14, 16); Side.BorderSizePixel = 0
+local SideLayout = Instance.new("UIListLayout", Side); SideLayout.Padding = UDim.new(0, 2); SideLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+local Area = Instance.new("Frame", Main); Area.Name = "Area"; Area.Size = UDim2.new(1, -140, 1, -48); Area.Position = UDim2.new(0, 135, 0, 43); Area.BackgroundTransparency = 1
+
+-- [2. BỘ ĐIỀU KHIỂN ENGINE TẠO TAB VÀ THÀNH PHẦN NÚT BẤM (FACTORY)]
+local Tabs, TabBtns, First = {}, {}, true
+local function AddTab(name)
+    local Page = Instance.new("ScrollingFrame", Area); Page.Size = UDim2.new(1, 0, 1, 0); Page.BackgroundTransparency = 1; Page.CanvasSize = UDim2.new(0, 0, 0, 650); Page.ScrollBarThickness = 2; Page.Visible = First
+    Instance.new("UIListLayout", Page).Padding = UDim.new(0, 5)
+    
+    local Btn = Instance.new("TextButton", Side); Btn.Size = UDim2.new(0, 120, 0, 30); Btn.Text = "  " .. name; Btn.Font = Enum.Font.GothamSemibold; Btn.TextSize = 11; Btn.TextColor3 = First and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(140, 140, 145); Btn.BackgroundColor3 = First and Color3.fromRGB(26, 26, 32) or Color3.fromRGB(0, 0, 0); Btn.BackgroundTransparency = First and 0 or 1; Btn.TextXAlignment = Enum.TextXAlignment.Left; Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 4)
+    
+    Btn.MouseButton1Click:Connect(function()
+        for _, p in pairs(Tabs) do p.Visible = false end
+        for _, b in pairs(TabBtns) do b.TextColor3 = Color3.fromRGB(140, 140, 145); b.BackgroundColor3 = Color3.fromRGB(0,0,0); b.BackgroundTransparency = 1 end
+        Page.Visible = true; Btn.TextColor3 = Color3.fromRGB(255, 255, 255); Btn.BackgroundColor3 = Color3.fromRGB(26, 26, 32); Btn.BackgroundTransparency = 0
+    end)
+    
+    table.insert(Tabs, Page); table.insert(TabBtns, Btn); First = false
+    
+    local UI = {}
+    function UI:AddLabel(text)
+        local Lbl = Instance.new("TextLabel", Page); Lbl.Size = UDim2.new(1, -6, 0, 24); Lbl.Text = text; Lbl.TextColor3 = Color3.fromRGB(255, 255, 255); Lbl.Font = Enum.Font.GothamBold; Lbl.TextSize = 12; Lbl.TextXAlignment = Enum.TextXAlignment.Left; Lbl.BackgroundTransparency = 1
+    end
+    
+    function UI:AddToggle(txt, sub, cb)
+        local Row = Instance.new("Frame", Page); Row.Size = UDim2.new(1, -6, 0, 40); Row.BackgroundColor3 = Color3.fromRGB(24, 24, 28); Instance.new("UICorner", Row).CornerRadius = UDim.new(0, 5)
+        local M = Instance.new("TextLabel", Row); M.Size = UDim2.new(1, -60, 0, 20); M.Position = UDim2.new(0, 12, 0, 2); M.Text = txt; M.TextColor3 = Color3.fromRGB(220, 220, 225); M.Font = Enum.Font.GothamSemibold; M.TextSize = 11.5; M.TextXAlignment = Enum.TextXAlignment.Left; M.BackgroundTransparency = 1
+        local S = Instance.new("TextLabel", Row); S.Size = UDim2.new(1, -60, 0, 16); S.Position = UDim2.new(0, 12, 0, 20); S.Text = sub; S.TextColor3 = Color3.fromRGB(130, 130, 135); S.Font = Enum.Font.Gotham; S.TextSize = 9.5; S.TextXAlignment = Enum.TextXAlignment.Left; S.BackgroundTransparency = 1
+        
+        local Trk = Instance.new("TextButton", Row); Trk.Size = UDim2.new(0, 36, 0, 18); Trk.Position = UDim2.new(1, -46, 0.5, -9); Trk.BackgroundColor3 = Color3.fromRGB(45, 45, 50); Trk.Text = ""; Instance.new("UICorner", Trk).CornerRadius = UDim.new(0, 9)
+        local Knb = Instance.new("Frame", Trk); Knb.Size = UDim2.new(0, 12, 0, 12); Knb.Position = UDim2.new(0, 3, 0.5, -6); Knb.BackgroundColor3 = Color3.fromRGB(255, 255, 255); Instance.new("UICorner", Knb).CornerRadius = UDim.new(0, 6)
+        
+        local Act = false
+        Trk.MouseButton1Click:Connect(function()
+            Act = not Act
+            TS:Create(Knb, TweenInfo.new(0.15), {Position = Act and UDim2.new(1, -15, 0.5, -6) or UDim2.new(0, 3, 0.5, -6)}):Play()
+            TS:Create(Trk, TweenInfo.new(0.15), {BackgroundColor3 = Act and Color3.fromRGB(60, 110, 255) or Color3.fromRGB(45, 45, 50)}):Play()
+            cb(Act)
+        end)
+    end
+    
+    function UI:AddDropdown(txt, opts, configKey)
+        local Row = Instance.new("Frame", Page); Row.Size = UDim2.new(1, -6, 0, 38); Row.BackgroundColor3 = Color3.fromRGB(24, 24, 28); Instance.new("UICorner", Row).CornerRadius = UDim.new(0, 5)
+        local Lbl = Instance.new("TextLabel", Row); Lbl.Size = UDim2.new(0, 120, 1, 0); Lbl.Position = UDim2.new(0, 12); Lbl.Text = txt; Lbl.TextColor3 = Color3.fromRGB(150, 150, 155); Lbl.Font = Enum.Font.Gotham; Lbl.TextSize = 11; Lbl.TextXAlignment = Enum.TextXAlignment.Left; Lbl.BackgroundTransparency = 1
+        
+        local B = Instance.new("TextButton", Row); B.Size = UDim2.new(0, 140, 0, 26); B.Position = UDim2.new(1, -150, 0.5, -13); B.BackgroundColor3 = Color3.fromRGB(34, 34, 40); B.Text = getgenv().Cfg[configKey]; B.TextColor3 = Color3.fromRGB(255, 255, 255); B.Font = Enum.Font.GothamSemibold; B.TextSize = 11; Instance.new("UICorner", B).CornerRadius = UDim.new(0, 4)
+        
+        local idx = 1
+        B.MouseButton1Click:Connect(function()
+            idx = idx >= #opts and 1 or idx + 1
+            B.Text = opts[idx]
+            getgenv().Cfg[configKey] = opts[idx]
+        end)
+    end
+    return UI
+end
+
+-- [3. KHỞI TẠO CÁC DANH MỤC TAB THEO HÌNH ẢNH]
+local TabMain = AddTab("🏠 Farm")
+local TabRaid = AddTab("🌀 Trái/Raid")
+local TabStats = AddTab("📊 Stats")
+local TabTele = AddTab("🌐 Dịch Chuyển")
+
+-- CẤU TRÚC GỘP CHUNG BONE VÀO TAB FARM CHUẨN 100% THEO ĐÚNG Ý KIỆT
+TabMain:AddDropdown("Chọn Công Cụ", {"Melee", "Sword", "Gun"}, "SelectedWp")
+
+TabMain:AddLabel("Main Farm")
+TabMain:AddToggle("TỰ ĐỘNG FARM CẤP", "Tự động nhận nhiệm vụ và farm cấp độ", function(s) getgenv().Cfg.Farm = s end)
+TabMain:AddToggle("Farm Kẻ Địch Gần Nhất", "Tự động tiêu diệt quái kích hoạt ở gần", function(s) getgenv().Cfg.Near = s end)
+TabMain:AddToggle("TỰ ĐỘNG FARM HẢI TẶC BIỂN", "Tự động hoàn thành sự kiện hải tặc tại Dinh Thự", function(s) getgenv().Cfg.Marine = s end)
+
+TabMain:AddLabel("Bones")
+TabMain:AddToggle("TỰ ĐỘNG FARM XƯƠNG", "Tự động gom quái khu vực xương để farm", function(s) getgenv().Cfg.Bone = s end)
+TabMain:AddToggle("Tự Động Giết Soul Reaper", "Tự động triệu hồi boss và tiêu diệt Soul Reaper", function(s) getgenv().Cfg.Soul = s end)
+TabMain:AddToggle("TỰ ĐỘNG ĐỔI XƯƠNG", "Tự động mua quà bất ngờ bằng xương", function(s) getgenv().Cfg.Surprise = s end)
+
+-- CÁC TAB BỔ TRỢ KHÁC
+TabRaid:AddLabel("Farm Mastery")
+TabRaid:AddDropdown("Phương Thức Mastery", {"Cake Land", "Dinh Thự", "Đảo Phụ"}, "SelectedIsland")
+TabRaid:AddToggle("Bật Farm Mastery Trái", "Tự động cày thông thạo trái ác quỷ", function(s) getgenv().Cfg.Mastery = s end)
+
+TabStats:AddLabel("Nâng Điểm Tự Động")
+TabStats:AddDropdown("Chọn Chỉ Số Nâng", {"Melee", "Defense", "Sword", "Gun"}, "SelectedStat")
+TabStats:AddToggle("Kích Hoạt Nâng Điểm", "Tự động cộng điểm chỉ số khi lên cấp", function(s) getgenv().Cfg.AutoStats = s end)
+
+TabTele:AddLabel("Hệ Thống Dịch Chuyển")
+TabTele:AddDropdown("Chọn Đảo Đến", {"Sea 1", "Sea 2", "Sea 3", "Đảo Rùa", "Tháp Chuông"}, "SelectedIsland")
+
+-- [4. HỆ THỐNG LOGIC VẬN HÀNH AUTO FARM NGẦM]
+local function EquipWeapon()
+    local w = getgenv().Cfg.SelectedWp; if not LP.Character then return end
+    for _, i in pairs(LP.Backpack:GetChildren()) do
+        if i:IsA("Tool") and ((w=="Melee" and (i.Name:find("Combat") or i.Name:find("Dark") or i.Name:find("God") or i.Name:find("Super"))) or (w=="Sword" and i:FindFirstChild("Tooltip") and i.Tooltip=="Sword") or (w=="Gun" and i:FindFirstChild("Tooltip") and i.Tooltip=="Gun")) then
+            i.Parent = LP.Character break
+        end
+    end
+end
+
+local function GetEnemy(nameKeyword)
+    local t, d = nil, math.huge
+    if workspace:FindFirstChild("Enemies") then
+        for _, e in pairs(workspace.Enemies:GetChildren()) do
+            if e:FindFirstChild("HumanoidRootPart") and e.Humanoid.Health > 0 and (not nameKeyword or e.Name:find(nameKeyword)) then
+                local m = (e.HumanoidRootPart.Position - LP.Character.HumanoidRootPart.Position).Magnitude
+                if m < d then t, d = e, m end
+            end
+        end
+    end
+    return t
+end
+
+task.spawn(function()
+    while task.wait() do
+        pcall(function()
+            if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+                local target = nil
+                if getgenv().Cfg.Farm then target = GetEnemy()
+                elseif getgenv().Cfg.Near then target = GetEnemy()
+                elseif getgenv().Cfg.Bone then target = GetEnemy("Reborn") or GetEnemy("Skeleton")
+                elseif getgenv().Cfg.Soul then target = GetEnemy("Soul Reaper") end
+                
+                if target then
+                    EquipWeapon()
+                    LP.Character.HumanoidRootPart.CFrame = target.HumanoidRootPart.CFrame * CFrame.new(0, 11, 0) * CFrame.Angles(math.rad(-90), 0, 0)
+                    if LP.Character:FindFirstChildOfClass("Tool") then LP.Character:FindFirstChildOfClass("Tool"):Activate() end
+                    local Combat = require(game:GetService("ReplicatedStorage").PlayerScripts.CombatFramework)
+                    local Cam = getupvalues(Combat)[2]
+                    if Cam and Cam.activeController then Cam.activeController.hitboxMagnitude = 55; Cam.activeController:attack() end
+                end
+                
+                if getgenv().Cfg.AutoStats then
+                    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AddPoint", getgenv().Cfg.SelectedStat, 1)
+                end
+                if getgenv().Cfg.Surprise then
+                    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Bones", "Buy", 1)
+                end
+            end
+        end)
+    end
+end)
