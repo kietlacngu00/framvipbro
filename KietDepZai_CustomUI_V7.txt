@@ -1,0 +1,477 @@
+-- ========================================================================
+--          KIETDEPZAI HUB V7 (CUSTOM UI CHÍNH CHỦ + LOGIC VIP)
+--          UI tự code 100% bằng Instance gốc siêu nhẹ, mượt, không lag
+-- ========================================================================
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local VirtualUser = game:GetService("VirtualUser")
+
+local Player = Players.LocalPlayer
+
+-- Xóa UI cũ nếu có
+if game.CoreGui:FindFirstChild("KietDepZaiHub") then 
+    game.CoreGui.KietDepZaiHub:Destroy() 
+end
+
+-- Bảng lưu cấu hình
+getgenv().Cfg = {
+    AutoLevel = false,
+    AutoNear = false,
+    AutoBone = false,
+    RandomBone = false,
+    AutoSnipeFruit = false,
+    RandomFruit = false,
+    SelectedWp = "Melee",
+    SelectedIsland = "Đảo Tân Thủ",
+    SelectedStat = "Melee",
+    AutoStats = false,
+}
+
+-- ========================================================================
+-- [1. TẠO GIAO DIỆN TỪ CON SỐ 0 (KHÔNG DÙNG LINK NGOÀI)]
+-- ========================================================================
+local SG = Instance.new("ScreenGui")
+SG.Name = "KietDepZaiHub"
+SG.Parent = game.CoreGui
+SG.ResetOnSpawn = false
+
+local Main = Instance.new("Frame", SG)
+Main.Size = UDim2.new(0, 520, 0, 350)
+Main.Position = UDim2.new(0.5, -260, 0.5, -175)
+Main.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+Main.BorderSizePixel = 0
+Main.ClipsDescendants = true
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
+
+local TopBar = Instance.new("Frame", Main)
+TopBar.Size = UDim2.new(1, 0, 0, 40)
+TopBar.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+TopBar.BorderSizePixel = 0
+Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 8)
+
+-- Che góc bo tròn phía dưới của TopBar
+local TopBarHider = Instance.new("Frame", TopBar)
+TopBarHider.Size = UDim2.new(1, 0, 0, 10)
+TopBarHider.Position = UDim2.new(0, 0, 1, -10)
+TopBarHider.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+TopBarHider.BorderSizePixel = 0
+
+local Title = Instance.new("TextLabel", TopBar)
+Title.Size = UDim2.new(0, 300, 1, 0)
+Title.Position = UDim2.new(0, 15, 0, 0)
+Title.Text = "KIẾT ĐẸP TRAI HUB | V7 PREMIUM"
+Title.TextColor3 = Color3.fromRGB(255, 140, 0) -- Màu cam chuẩn
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.BackgroundTransparency = 1
+
+local CloseBtn = Instance.new("TextButton", TopBar)
+CloseBtn.Size = UDim2.new(0, 40, 1, 0)
+CloseBtn.Position = UDim2.new(1, -40, 0, 0)
+CloseBtn.Text = "×"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+CloseBtn.BackgroundTransparency = 1
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextSize = 22
+CloseBtn.MouseButton1Click:Connect(function() SG:Destroy() end)
+
+local MinBtn = Instance.new("TextButton", TopBar)
+MinBtn.Size = UDim2.new(0, 40, 1, 0)
+MinBtn.Position = UDim2.new(1, -80, 0, 0)
+MinBtn.Text = "−"
+MinBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+MinBtn.BackgroundTransparency = 1
+MinBtn.Font = Enum.Font.GothamBold
+MinBtn.TextSize = 22
+
+local isMinimized = false
+MinBtn.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    if isMinimized then
+        TweenService:Create(Main, TweenInfo.new(0.2), {Size = UDim2.new(0, 520, 0, 40)}):Play()
+    else
+        TweenService:Create(Main, TweenInfo.new(0.2), {Size = UDim2.new(0, 520, 0, 350)}):Play()
+    end
+end)
+
+-- Kéo thả UI mượt cho cả Mobile và PC
+local drag, dInput, dStart, sPos
+TopBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        drag = true
+        dStart = input.Position
+        sPos = Main.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then drag = false end
+        end)
+    end
+end)
+TopBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dInput = input
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if input == dInput and drag then
+        local delta = input.Position - dStart
+        Main.Position = UDim2.new(sPos.X.Scale, sPos.X.Offset + delta.X, sPos.Y.Scale, sPos.Y.Offset + delta.Y)
+    end
+end)
+
+local Sidebar = Instance.new("ScrollingFrame", Main)
+Sidebar.Size = UDim2.new(0, 130, 1, -40)
+Sidebar.Position = UDim2.new(0, 0, 0, 40)
+Sidebar.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+Sidebar.BorderSizePixel = 0
+Sidebar.ScrollBarThickness = 0
+local SideLayout = Instance.new("UIListLayout", Sidebar)
+SideLayout.Padding = UDim.new(0, 5)
+SideLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+SideLayout.SortOrder = Enum.SortOrder.LayoutOrder
+Instance.new("UIPadding", Sidebar).PaddingTop = UDim.new(0, 10)
+
+local ContentArea = Instance.new("Frame", Main)
+ContentArea.Size = UDim2.new(1, -130, 1, -40)
+ContentArea.Position = UDim2.new(0, 130, 0, 40)
+ContentArea.BackgroundTransparency = 1
+
+-- ENGINE TẠO TAB VÀ CHỨC NĂNG
+local Tabs, TabBtns, First = {}, {}, true
+local function CreateTab(name)
+    local Page = Instance.new("ScrollingFrame", ContentArea)
+    Page.Size = UDim2.new(1, 0, 1, 0)
+    Page.BackgroundTransparency = 1
+    Page.ScrollBarThickness = 2
+    Page.ScrollBarImageColor3 = Color3.fromRGB(255, 140, 0)
+    Page.Visible = First
+    
+    local PageLayout = Instance.new("UIListLayout", Page)
+    PageLayout.Padding = UDim.new(0, 8)
+    PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    Instance.new("UIPadding", Page).PaddingTop = UDim.new(0, 10)
+    Instance.new("UIPadding", Page).PaddingLeft = UDim.new(0, 10)
+    Instance.new("UIPadding", Page).PaddingRight = UDim.new(0, 10)
+
+    -- Tự dãn Canvas
+    PageLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        Page.CanvasSize = UDim2.new(0, 0, 0, PageLayout.AbsoluteContentSize.Y + 20)
+    end)
+
+    local Btn = Instance.new("TextButton", Sidebar)
+    Btn.Size = UDim2.new(0, 115, 0, 32)
+    Btn.Text = name
+    Btn.Font = Enum.Font.GothamBold
+    Btn.TextSize = 12
+    Btn.TextColor3 = First and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
+    Btn.BackgroundColor3 = First and Color3.fromRGB(255, 140, 0) or Color3.fromRGB(35, 35, 40)
+    Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6)
+    
+    Btn.MouseButton1Click:Connect(function()
+        for _, p in pairs(Tabs) do p.Visible = false end
+        for _, b in pairs(TabBtns) do 
+            b.TextColor3 = Color3.fromRGB(150, 150, 150)
+            b.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+        end
+        Page.Visible = true
+        Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Btn.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+    end)
+
+    table.insert(Tabs, Page)
+    table.insert(TabBtns, Btn)
+    First = false
+
+    local Elements = {}
+
+    function Elements:AddLabel(txt)
+        local Lbl = Instance.new("TextLabel", Page)
+        Lbl.Size = UDim2.new(1, 0, 0, 20)
+        Lbl.Text = txt
+        Lbl.TextColor3 = Color3.fromRGB(255, 140, 0)
+        Lbl.Font = Enum.Font.GothamBold
+        Lbl.TextSize = 14
+        Lbl.TextXAlignment = Enum.TextXAlignment.Left
+        Lbl.BackgroundTransparency = 1
+    end
+
+    function Elements:AddToggle(txt, configKey)
+        local Row = Instance.new("Frame", Page)
+        Row.Size = UDim2.new(1, 0, 0, 38)
+        Row.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+        Instance.new("UICorner", Row).CornerRadius = UDim.new(0, 6)
+
+        local Lbl = Instance.new("TextLabel", Row)
+        Lbl.Size = UDim2.new(1, -60, 1, 0)
+        Lbl.Position = UDim2.new(0, 10, 0, 0)
+        Lbl.Text = txt
+        Lbl.TextColor3 = Color3.fromRGB(220, 220, 220)
+        Lbl.Font = Enum.Font.GothamSemibold
+        Lbl.TextSize = 12
+        Lbl.TextXAlignment = Enum.TextXAlignment.Left
+        Lbl.BackgroundTransparency = 1
+
+        local Trk = Instance.new("TextButton", Row)
+        Trk.Size = UDim2.new(0, 36, 0, 18)
+        Trk.Position = UDim2.new(1, -46, 0.5, -9)
+        Trk.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+        Trk.Text = ""
+        Instance.new("UICorner", Trk).CornerRadius = UDim.new(1, 0)
+
+        local Knb = Instance.new("Frame", Trk)
+        Knb.Size = UDim2.new(0, 14, 0, 14)
+        Knb.Position = UDim2.new(0, 2, 0.5, -7)
+        Knb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        Instance.new("UICorner", Knb).CornerRadius = UDim.new(1, 0)
+
+        local Act = getgenv().Cfg[configKey]
+        Trk.MouseButton1Click:Connect(function()
+            Act = not Act
+            getgenv().Cfg[configKey] = Act
+            TweenService:Create(Knb, TweenInfo.new(0.15), {Position = Act and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)}):Play()
+            TweenService:Create(Trk, TweenInfo.new(0.15), {BackgroundColor3 = Act and Color3.fromRGB(255, 140, 0) or Color3.fromRGB(50, 50, 55)}):Play()
+        end)
+    end
+
+    function Elements:AddDropdown(txt, opts, configKey)
+        local Row = Instance.new("Frame", Page)
+        Row.Size = UDim2.new(1, 0, 0, 38)
+        Row.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+        Instance.new("UICorner", Row).CornerRadius = UDim.new(0, 6)
+
+        local Lbl = Instance.new("TextLabel", Row)
+        Lbl.Size = UDim2.new(0, 150, 1, 0)
+        Lbl.Position = UDim2.new(0, 10, 0, 0)
+        Lbl.Text = txt
+        Lbl.TextColor3 = Color3.fromRGB(220, 220, 220)
+        Lbl.Font = Enum.Font.GothamSemibold
+        Lbl.TextSize = 12
+        Lbl.TextXAlignment = Enum.TextXAlignment.Left
+        Lbl.BackgroundTransparency = 1
+
+        local B = Instance.new("TextButton", Row)
+        B.Size = UDim2.new(0, 120, 0, 26)
+        B.Position = UDim2.new(1, -130, 0.5, -13)
+        B.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+        B.Text = getgenv().Cfg[configKey]
+        B.TextColor3 = Color3.fromRGB(255, 255, 255)
+        B.Font = Enum.Font.GothamBold
+        B.TextSize = 11
+        Instance.new("UICorner", B).CornerRadius = UDim.new(0, 4)
+
+        local idx = 1
+        B.MouseButton1Click:Connect(function()
+            idx = idx >= #opts and 1 or idx + 1
+            B.Text = opts[idx]
+            getgenv().Cfg[configKey] = opts[idx]
+        end)
+    end
+
+    function Elements:AddButton(txt, cb)
+        local B = Instance.new("TextButton", Page)
+        B.Size = UDim2.new(1, 0, 0, 34)
+        B.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+        B.Text = txt
+        B.TextColor3 = Color3.fromRGB(255, 255, 255)
+        B.Font = Enum.Font.GothamBold
+        B.TextSize = 12
+        Instance.new("UICorner", B).CornerRadius = UDim.new(0, 6)
+        B.MouseButton1Click:Connect(cb)
+    end
+
+    return Elements
+end
+
+-- TẠO CÁC DANH MỤC GIAO DIỆN
+local TabFarm = CreateTab("⚔️ Cày Cấp")
+local TabItem = CreateTab("🦴 Vật Phẩm")
+local TabTele = CreateTab("🌐 Dịch Chuyển")
+
+TabFarm:AddLabel("Cài Đặt Vũ Khí")
+TabFarm:AddDropdown("Vũ Khí Sử Dụng", {"Melee", "Sword", "Blox Fruit"}, "SelectedWp")
+
+TabFarm:AddLabel("Hệ Thống Cày Tự Động")
+TabFarm:AddToggle("Auto Farm Cấp (Chuẩn)", "AutoLevel")
+TabFarm:AddToggle("Auto Đánh Quái Gần", "AutoNear")
+TabFarm:AddToggle("Auto Nâng Điểm (Stats)", "AutoStats")
+TabFarm:AddDropdown("Chọn Chỉ Số", {"Melee", "Defense", "Sword", "Demon Fruit"}, "SelectedStat")
+
+TabItem:AddLabel("Hệ Thống Xương (Sea 3)")
+TabItem:AddToggle("Auto Cày Xương", "AutoBone")
+TabItem:AddToggle("Auto Đổi Xương (Gacha)", "RandomBone")
+
+TabItem:AddLabel("Hệ Thống Trái Ác Quỷ")
+TabItem:AddToggle("Auto Nhặt Trái", "AutoSnipeFruit")
+TabItem:AddToggle("Auto Random Trái", "RandomFruit")
+
+TabTele:AddLabel("Chuyển Sea Tốc Độ Cao")
+TabTele:AddButton("Bay Sang Sea 1", function() ReplicatedStorage.Remotes.CommF_:InvokeServer("TravelMain") end)
+TabTele:AddButton("Bay Sang Sea 2", function() ReplicatedStorage.Remotes.CommF_:InvokeServer("TravelDressrosa") end)
+TabTele:AddButton("Bay Sang Sea 3", function() ReplicatedStorage.Remotes.CommF_:InvokeServer("TravelZu") end)
+
+
+-- ========================================================================
+-- [2. LOGIC LÕI V6 PREMIUM (KHÔNG RUNG LẮC, ĐÁNH XA, GOM QUÁI)]
+-- ========================================================================
+
+local Pos = CFrame.new(0, 8.5, 0) 
+_G.Fast_Delay = 0.05
+
+local function EquipTool()
+    local wp = getgenv().Cfg.SelectedWp
+    if not Player.Character then return end
+    for _, v in pairs(Player.Backpack:GetChildren()) do
+        if v:IsA("Tool") and (v.Name:find(wp) or v.ToolTip == wp or (wp == "Melee" and v.ToolTip == "Melee")) then
+            v.Parent = Player.Character
+            break
+        end
+    end
+end
+
+local function AttackNoCoolDown()
+    pcall(function()
+        local tool = Player.Character:FindFirstChildOfClass("Tool")
+        if tool then
+            tool:Activate()
+            VirtualUser:CaptureController()
+            VirtualUser:Button1Down(Vector2.new(0, 0), Workspace.CurrentCamera.CFrame)
+        end
+        ReplicatedStorage.Remotes.CommF_:InvokeServer("Attack")
+    end)
+end
+
+local function BKP(targetCFrame)
+    pcall(function()
+        if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+            Player.Character.HumanoidRootPart.CFrame = targetCFrame
+            Player.Character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+        end
+    end)
+end
+
+local function Tween2(targetCFrame)
+    pcall(function()
+        local hrp = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        local dist = (hrp.Position - targetCFrame.Position).Magnitude
+        if dist < 150 then
+            hrp.CFrame = targetCFrame
+        else
+            local tweenInfo = TweenInfo.new(dist / 350, Enum.EasingStyle.Linear)
+            local tween = TweenService:Create(hrp, tweenInfo, {CFrame = targetCFrame})
+            tween:Play()
+        end
+    end)
+end
+
+local function PerfectBringMob(targetMob)
+    if not targetMob or not targetMob:FindFirstChild("HumanoidRootPart") then return end
+    if Workspace:FindFirstChild("Enemies") then
+        for _, v in pairs(Workspace.Enemies:GetChildren()) do
+            if v.Name == targetMob.Name and v:FindFirstChild("HumanoidRootPart") and v.Humanoid.Health > 0 then
+                if (v.HumanoidRootPart.Position - targetMob.HumanoidRootPart.Position).Magnitude <= 350 then
+                    v.HumanoidRootPart.CFrame = targetMob.HumanoidRootPart.CFrame
+                    v.HumanoidRootPart.CanCollide = false
+                    v.HumanoidRootPart.Size = Vector3.new(60, 60, 60)
+                    v.Humanoid.WalkSpeed = 0
+                    v.Humanoid.JumpPower = 0
+                    v.Humanoid:ChangeState(11)
+                    v.Humanoid:ChangeState(14)
+                    if v:FindFirstChild("Head") then v.Head.CanCollide = false end
+                end
+            end
+        end
+    end
+end
+
+-- Chống AFK
+Player.Idled:Connect(function()
+    VirtualUser:Button2Down(Vector2.new(0, 0), Workspace.CurrentCamera.CFrame)
+    task.wait()
+    VirtualUser:Button2Up(Vector2.new(0, 0), Workspace.CurrentCamera.CFrame)
+end)
+
+-- VÒNG LẶP CHẠY FARM QUÁI VÀ CẤP
+task.spawn(function()
+    while task.wait() do
+        pcall(function()
+            if getgenv().Cfg.AutoLevel or getgenv().Cfg.AutoNear then
+                local foundMob = false
+                for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
+                    if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 and enemy:FindFirstChild("HumanoidRootPart") then
+                        foundMob = true
+                        BKP(enemy.HumanoidRootPart.CFrame * Pos)
+                        PerfectBringMob(enemy)
+                        EquipTool()
+                        AttackNoCoolDown()
+                        break
+                    end
+                end
+                if not foundMob and getgenv().Cfg.AutoLevel and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+                    Player.Character.HumanoidRootPart.Velocity = Vector3.new(0,0,0)
+                end
+            end
+        end)
+    end
+end)
+
+-- VÒNG LẶP CÀY XƯƠNG
+task.spawn(function()
+    while task.wait() do
+        pcall(function()
+            if getgenv().Cfg.AutoBone then
+                local boneMobNames = {"Reborn Skeleton", "Living Zombie", "Demonic Soul", "Posessed Mummy"}
+                local targetBone = nil
+                
+                if Workspace:FindFirstChild("Enemies") then
+                    for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
+                        if table.find(boneMobNames, enemy.Name) and enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+                            targetBone = enemy
+                            break
+                        end
+                    end
+                end
+
+                if targetBone then
+                    BKP(targetBone.HumanoidRootPart.CFrame * Pos)
+                    PerfectBringMob(targetBone)
+                    EquipTool()
+                    AttackNoCoolDown()
+                else
+                    Tween2(CFrame.new(-9515.75, 174.85, 6079.40))
+                end
+            end
+            
+            if getgenv().Cfg.RandomBone then
+                ReplicatedStorage.Remotes.CommF_:InvokeServer("Bones", "Buy", 1, 1)
+            end
+        end)
+    end
+end)
+
+-- CÁC CHỨC NĂNG BỔ TRỢ KHÁC
+task.spawn(function()
+    while task.wait(1) do
+        pcall(function()
+            if getgenv().Cfg.AutoStats then
+                ReplicatedStorage.Remotes.CommF_:InvokeServer("AddPoint", getgenv().Cfg.SelectedStat, 3)
+            end
+            if getgenv().Cfg.RandomFruit then
+                ReplicatedStorage.Remotes.CommF_:InvokeServer("Cousin", "Buy")
+            end
+            if getgenv().Cfg.AutoSnipeFruit then
+                for _, v in pairs(Workspace:GetChildren()) do
+                    if v:IsA("Tool") and v.Name:find("Fruit") and v:FindFirstChild("Handle") then
+                        Player.Character.HumanoidRootPart.CFrame = v.Handle.CFrame
+                    end
+                end
+            end
+        end)
+    end
+end)
