@@ -137,7 +137,7 @@ if Update:LoadAnimation() then
 	Update:Loaded();
 end;
 local Library = Update:Window({
-	SubTitle = "by Quang Huy",
+	SubTitle = "by kietdepzai",
 	Size = UDim2.new(0, 450, 0, 300),
 	TabWidth = 140
 });
