@@ -1,5 +1,5 @@
 -- local function scary()
---     warn("❌ This script must only be executed from the offical Bear hud loader")
+--     warn("❌ This script must only be executed from the offical kietdepzai hud loader")
 --         return
 --     end
 
@@ -36,7 +36,7 @@
 -- end
 -- _G._secondaryData = nil
 -- _G.__userKey = nil
-print("✅ Security verification passed. Loading Bear hud...")
+print("✅ Security verification passed. Loading kietdepzai hud...")
 -- FIX XÁC ĐỊNH SEA CHO CẢ SERVER THƯỜNG VÀ VIP
 local function detectSea()
     local placeId = game.PlaceId
@@ -120,7 +120,7 @@ spawn(function()
     wait(3)
     local sea = World1 and "Biển 1" or World2 and "Biển 2" or World3 and "Biển 3" or "Không xác định"
     game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Bear Hub",
+        Title = "kietdepzai Hub",
         Text = "Đang chạy ở " .. sea,
         Duration = 3
     })
@@ -129,7 +129,7 @@ end)
 -- print("-- [[ Webhook ]] --");
 -- (loadstring(game:HttpGet("https://gitshare.me/backend/api/files/677ec71a-082b-4b8c-a1e8-f590f2ab286a/download")))();
 -- print("--------------------------------------------------------------------------");
-local Update = (loadstring(Game:HttpGet("https://raw.githubusercontent.com/Huylovemy/Huyscript/refs/heads/main/Avatar.lua")))();
+local Update = (loadstring(Game:HttpGet("https://raw.githubusercontent.com/kietlacngu00/kietdepzaiUI/refs/heads/main/uibear.txt")))();
 if Update:LoadAnimation() then
 	Update:StartLoad();
 end;
@@ -293,7 +293,7 @@ _G.Settings = {
 		["Auto Dragon Trident"] = false,
 		["Auto Pole"] = false,
 		["Auto Shawk Saw"] = false,
-		["Auto Greybeard"] = false,
+		["Auto Greykietdepzaid"] = false,
 		["Auto Swan Glasses"] = false,
 		["Auto Arena Trainer"] = false,
 		["Auto Dark Dagger"] = false,
@@ -441,16 +441,16 @@ _G.Settings = {
 };
 (getgenv()).Load = function()
 	if readfile and writefile and isfile and isfolder then
-		if not isfolder("Bear hud") then
-			makefolder("Bear hud");
+		if not isfolder("kietdepzai hud") then
+			makefolder("kietdepzai hud");
 		end;
-		if not isfolder("Bear hud/Blox Fruits/") then
-			makefolder("Bear hud/Blox Fruits/");
+		if not isfolder("kietdepzai hud/Blox Fruits/") then
+			makefolder("kietdepzai hud/Blox Fruits/");
 		end;
-		if not isfile(("Bear Hud/Blox Fruits/" .. game.Players.LocalPlayer.Name .. ".json")) then
-			writefile("Bear hud/Blox Fruits/" .. game.Players.LocalPlayer.Name .. ".json", (game:GetService("HttpService")):JSONEncode(_G.Settings));
+		if not isfile(("kietdepzai Hud/Blox Fruits/" .. game.Players.LocalPlayer.Name .. ".json")) then
+			writefile("kietdepzai hud/Blox Fruits/" .. game.Players.LocalPlayer.Name .. ".json", (game:GetService("HttpService")):JSONEncode(_G.Settings));
 		else
-			local Decode = (game:GetService("HttpService")):JSONDecode(readfile("Bear hud/Blox Fruits/" .. game.Players.LocalPlayer.Name .. ".json"));
+			local Decode = (game:GetService("HttpService")):JSONDecode(readfile("kietdepzai hud/Blox Fruits/" .. game.Players.LocalPlayer.Name .. ".json"));
 			for i, v in pairs(Decode) do
 				_G.Settings[i] = v;
 			end;
@@ -463,15 +463,15 @@ end;
 (getgenv()).SaveSetting = function()
 	if Update:SaveSettings() then
 		if readfile and writefile and isfile and isfolder then
-			if not isfile(("Bear hud/Blox Fruits/" .. game.Players.LocalPlayer.Name .. ".json")) then
+			if not isfile(("kietdepzai hud/Blox Fruits/" .. game.Players.LocalPlayer.Name .. ".json")) then
 				(getgenv()).Load();
 			else
-				local Decode = (game:GetService("HttpService")):JSONDecode(readfile("Bear hud/Blox Fruits/" .. game.Players.LocalPlayer.Name .. ".json"));
+				local Decode = (game:GetService("HttpService")):JSONDecode(readfile("kietdepzai hud/Blox Fruits/" .. game.Players.LocalPlayer.Name .. ".json"));
 				local Array = {};
 				for i, v in pairs(_G.Settings) do
 					Array[i] = v;
 				end;
-				writefile("Bear hud/Blox Fruits/" .. game.Players.LocalPlayer.Name .. ".json", (game:GetService("HttpService")):JSONEncode(Array));
+				writefile("kietdepzai hud/Blox Fruits/" .. game.Players.LocalPlayer.Name .. ".json", (game:GetService("HttpService")):JSONEncode(Array));
 			end;
 		else
 			return warn("Status : Undetected Executor");
@@ -2267,7 +2267,7 @@ spawn(function()
 	pcall(function()
 		while wait() do
 			if World1 then
-				if _G.Settings.Farm["Auto Farm Leather"] or _G.Settings.Farm["Auto Farm Magma Ore"] or _G.Settings.Farm["Auto Farm Scrap Metal"] or _G.Settings.Farm["Auto Saber"] or _G.Settings.Items["Auto Second Sea"] or _G.Settings.Items["Auto Warden Sword"] or _G.Settings.Items["Auto Greybeard"] or _G.Settings.Items["Auto Pole"] or _G.Settings.Items["Auto Shark Saw"] or _G.Settings.Farm["Auto Farm Angel Wings"] then
+				if _G.Settings.Farm["Auto Farm Leather"] or _G.Settings.Farm["Auto Farm Magma Ore"] or _G.Settings.Farm["Auto Farm Scrap Metal"] or _G.Settings.Farm["Auto Saber"] or _G.Settings.Items["Auto Second Sea"] or _G.Settings.Items["Auto Warden Sword"] or _G.Settings.Items["Auto Greykietdepzaid"] or _G.Settings.Items["Auto Pole"] or _G.Settings.Items["Auto Shark Saw"] or _G.Settings.Farm["Auto Farm Angel Wings"] then
 					if not (game:GetService("Players")).LocalPlayer.Character.HumanoidRootPart:FindFirstChild("BodyClip") then
 						local Noclip = Instance.new("BodyVelocity");
 						Noclip.Name = "BodyClip";
@@ -2284,7 +2284,7 @@ spawn(function()
 	pcall(function()
 		while wait() do
 			if World1 then
-				if _G.Settings.Farm["Auto Farm Leather"] or _G.Settings.Farm["Auto Farm Magma Ore"] or _G.Settings.Farm["Auto Farm Scrap Metal"] or _G.Settings.Farm["Auto Saber"] or _G.Settings.Items["Auto Second Sea"] or _G.Settings.Items["Auto Warden Sword"] or _G.Settings.Items["Auto Greybeard"] or _G.Settings.Items["Auto Pole"] or _G.Settings.Items["Auto Shark Saw"] or _G.Settings.Farm["Auto Farm Angel Wings"] then
+				if _G.Settings.Farm["Auto Farm Leather"] or _G.Settings.Farm["Auto Farm Magma Ore"] or _G.Settings.Farm["Auto Farm Scrap Metal"] or _G.Settings.Farm["Auto Saber"] or _G.Settings.Items["Auto Second Sea"] or _G.Settings.Items["Auto Warden Sword"] or _G.Settings.Items["Auto Greykietdepzaid"] or _G.Settings.Items["Auto Pole"] or _G.Settings.Items["Auto Shark Saw"] or _G.Settings.Farm["Auto Farm Angel Wings"] then
 					for _, v in pairs((game:GetService("Players")).LocalPlayer.Character:GetDescendants()) do
 						if v:IsA("BasePart") then
 							v.CanCollide = false;
@@ -3693,7 +3693,7 @@ elseif World2 then
 		"Don Swan",
 		"Smoke Admiral",
 		"Cursed Captain",
-		"Darkbeard",
+		"Darkkietdepzaid",
 		"Order",
 		"Awakened Ice Admiral",
 		"Tide Keeper"
@@ -6081,14 +6081,14 @@ spawn(function()
 					if game.Players.LocalPlayer.Backpack:FindFirstChild("Fishman Karate") and (game.Players.LocalPlayer.Backpack:FindFirstChild("Fishman Karate")).Level.Value >= 300 and (game:GetService("Players")).Localplayer.Data.Fragments.Value >= 1500 then
 						UnEquipWeapon("Fishman Karate");
 						wait(0.1);
-						(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackbeardReward", "DragonClaw", "1");
-						(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackbeardReward", "DragonClaw", "2");
+						(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackkietdepzaidReward", "DragonClaw", "1");
+						(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackkietdepzaidReward", "DragonClaw", "2");
 					end;
 					if game.Players.LocalPlayer.Character:FindFirstChild("Fishman Karate") and (game.Players.LocalPlayer.Character:FindFirstChild("Fishman Karate")).Level.Value >= 300 and (game:GetService("Players")).Localplayer.Data.Fragments.Value >= 1500 then
 						UnEquipWeapon("Fishman Karate");
 						wait(0.1);
-						(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackbeardReward", "DragonClaw", "1");
-						(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackbeardReward", "DragonClaw", "2");
+						(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackkietdepzaidReward", "DragonClaw", "1");
+						(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackkietdepzaidReward", "DragonClaw", "2");
 					end;
 					if game.Players.LocalPlayer.Backpack:FindFirstChild("Dragon Claw") and (game.Players.LocalPlayer.Backpack:FindFirstChild("Dragon Claw")).Level.Value >= 300 and (game:GetService("Players")).LocalPlayer.Data.Beli.Value >= 3000000 then
 						UnEquipWeapon("Dragon Claw");
@@ -6273,7 +6273,7 @@ spawn(function()
 					_G.Settings.Main["Selected Weapon"] = "Dragon Claw";
 				end;
 			else
-				(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackbeardReward", "DragonClaw", "2");
+				(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackkietdepzaidReward", "DragonClaw", "2");
 			end;
 		end;
 	end;
@@ -7337,8 +7337,8 @@ if World3 then
 		end;
 		if not CheckItemCount("Dark Fragment", 1) then
 			if World2 then
-				if CheckNameBoss("Darkbeard [Lv. 1000] [Raid Boss]") then
-					local v = CheckNameBoss("Darkbeard [Lv. 1000] [Raid Boss]");
+				if CheckNameBoss("Darkkietdepzaid [Lv. 1000] [Raid Boss]") then
+					local v = CheckNameBoss("Darkkietdepzaid [Lv. 1000] [Raid Boss]");
 					repeat
 						task.wait();
 						AutoHaki();
@@ -7350,14 +7350,14 @@ if World3 then
 						Attack();
 					until v.Humanoid.Health <= 0 or (not v.Parent);
 				elseif game.Players.LocalPlayer.Character:FindFirstChild("Fist of Darkness") or game.Players.LocalPlayer.Backpack:FindFirstChild("Fist of Darkness") then
-					if ((game:GetService("Workspace")).Map.DarkbeardArena.Summoner.Detection.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 5 then
+					if ((game:GetService("Workspace")).Map.DarkkietdepzaidArena.Summoner.Detection.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 5 then
 						EquipWeapon("Fist of Darkness");
-						firetouchinterest(game.Players.LocalPlayer.Character["Fist of Darkness"].Handle, (game:GetService("Workspace")).Map.DarkbeardArena.Summoner.Detection, 0);
-						firetouchinterest(game.Players.LocalPlayer.Character["Fist of Darkness"].Handle, (game:GetService("Workspace")).Map.DarkbeardArena.Summoner.Detection, 1);
-						firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, (game:GetService("Workspace")).Map.DarkbeardArena.Summoner.Detection, 0);
-						firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, (game:GetService("Workspace")).Map.DarkbeardArena.Summoner.Detection, 1);
+						firetouchinterest(game.Players.LocalPlayer.Character["Fist of Darkness"].Handle, (game:GetService("Workspace")).Map.DarkkietdepzaidArena.Summoner.Detection, 0);
+						firetouchinterest(game.Players.LocalPlayer.Character["Fist of Darkness"].Handle, (game:GetService("Workspace")).Map.DarkkietdepzaidArena.Summoner.Detection, 1);
+						firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, (game:GetService("Workspace")).Map.DarkkietdepzaidArena.Summoner.Detection, 0);
+						firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, (game:GetService("Workspace")).Map.DarkkietdepzaidArena.Summoner.Detection, 1);
 					else
-						topos((game:GetService("Workspace")).Map.DarkbeardArena.Summoner.Detection.CFrame);
+						topos((game:GetService("Workspace")).Map.DarkkietdepzaidArena.Summoner.Detection.CFrame);
 					end;
 				else
 					local v = DetectChest();
@@ -8989,11 +8989,11 @@ if World1 then
 	local GayMakPos = CFrame.new(-5023.38330078125, 28.65203285217285, 4332.3818359375);
 	spawn(function()
 		while wait(0.2) do
-			if _G.Settings.Items["Auto Greybeard"] and World1 then
+			if _G.Settings.Items["Auto Greykietdepzaid"] and World1 then
 				pcall(function()
-					if (game:GetService("Workspace")).Enemies:FindFirstChild("Greybeard") then
+					if (game:GetService("Workspace")).Enemies:FindFirstChild("Greykietdepzaid") then
 						for i, v in pairs((game:GetService("Workspace")).Enemies:GetChildren()) do
-							if v.Name == "Greybeard" then
+							if v.Name == "Greykietdepzaid" then
 								if v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v.Humanoid.Health > 0 then
 									repeat
 										(game:GetService("RunService")).Heartbeat:wait();
@@ -9004,7 +9004,7 @@ if World1 then
 										v.HumanoidRootPart.Size = Vector3.new(1, 1, 1);
 										topos(v.HumanoidRootPart.CFrame * Pos);
 										Attack();
-									until not _G.Settings.Items["Auto Greybeard"] or (not v.Parent) or v.Humanoid.Health <= 0;
+									until not _G.Settings.Items["Auto Greykietdepzaid"] or (not v.Parent) or v.Humanoid.Health <= 0;
 								end;
 							end;
 						end;
@@ -9012,8 +9012,8 @@ if World1 then
 						topos(GayMakPos);
 						UnEquipWeapon(_G.Settings.Main["Selected Weapon"]);
 						topos(CFrame.new(-5023.38330078125, 28.65203285217285, 4332.3818359375));
-						if (game:GetService("ReplicatedStorage")):FindFirstChild("Greybeard") then
-							topos(((game:GetService("ReplicatedStorage")):FindFirstChild("Greybeard")).HumanoidRootPart.CFrame * CFrame.new(2, 20, 2));
+						if (game:GetService("ReplicatedStorage")):FindFirstChild("Greykietdepzaid") then
+							topos(((game:GetService("ReplicatedStorage")):FindFirstChild("Greykietdepzaid")).HumanoidRootPart.CFrame * CFrame.new(2, 20, 2));
 						end;
 					end;
 				end);
@@ -9030,9 +9030,9 @@ if World1 then
 		StopTween(_G.Settings.Items["Auto Shark Saw"]);
 		(getgenv()).SaveSetting();
 	end);
-	ItemsTab:Toggle("Auto Greybeard", _G.Settings.Items["Auto Greybeard"], false, function(value)
-		_G.Settings.Items["Auto Greybeard"] = value;
-		StopTween(_G.Settings.Items["Auto Greybeard"]);
+	ItemsTab:Toggle("Auto Greykietdepzaid", _G.Settings.Items["Auto Greykietdepzaid"], false, function(value)
+		_G.Settings.Items["Auto Greykietdepzaid"] = value;
+		StopTween(_G.Settings.Items["Auto Greykietdepzaid"]);
 		(getgenv()).SaveSetting();
 	end);
 	local PolePos = CFrame.new(-7748.0185546875, 5606.80615234375, -2305.898681640625);
@@ -10810,8 +10810,8 @@ if World2 or World3 then
 					if _G.Settings.Raid["Law Raid"] then
 						if not (game:GetService("Players")).LocalPlayer.Character:FindFirstChild("Microchip") and (not (game:GetService("Players")).LocalPlayer.Backpack:FindFirstChild("Microchip")) and (not (game:GetService("Workspace")).Enemies:FindFirstChild("Order")) and (not (game:GetService("ReplicatedStorage")):FindFirstChild("Order")) then
 							wait(0.3);
-							(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackbeardReward", "Microchip", "1");
-							(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackbeardReward", "Microchip", "2");
+							(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackkietdepzaidReward", "Microchip", "1");
+							(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackkietdepzaidReward", "Microchip", "2");
 						end;
 					end;
 				end;
@@ -11287,8 +11287,8 @@ ShopTab:Button("Buy Water Kung Fu [ $750,000 ]", function()
 	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BuyFishmanKarate");
 end);
 ShopTab:Button("Buy Dragon Claw [ Æ’1,500 ]", function()
-	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackbeardReward", "DragonClaw", "1");
-	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackbeardReward", "DragonClaw", "2");
+	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackkietdepzaidReward", "DragonClaw", "1");
+	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackkietdepzaidReward", "DragonClaw", "2");
 end);
 ShopTab:Button("Buy Superhuman [ $3,000,000 ]", function()
 	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BuySuperhuman");
@@ -11368,8 +11368,8 @@ ShopTab:Button("Cannon [ $100,000 ]", function()
 	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BuyItem", "Cannon");
 end);
 ShopTab:Button("Kabucha [ Æ’1,500]", function()
-	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackbeardReward", "Slingshot", "1");
-	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackbeardReward", "Slingshot", "2");
+	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackkietdepzaidReward", "Slingshot", "1");
+	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackkietdepzaidReward", "Slingshot", "2");
 end);
 ShopTab:Button("Bizarre Rifle [ 250 Ectoplasm ]", function()
 	local A_1 = "Ectoplasm";
@@ -11380,12 +11380,12 @@ ShopTab:Button("Bizarre Rifle [ 250 Ectoplasm ]", function()
 end);
 ShopTab:Seperator("Stats");
 ShopTab:Button("Reset Stats [ Use Æ’2,500 ]", function()
-	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackbeardReward", "Refund", "1");
-	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackbeardReward", "Refund", "2");
+	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackkietdepzaidReward", "Refund", "1");
+	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackkietdepzaidReward", "Refund", "2");
 end);
 ShopTab:Button("Random Race [ Use Æ’3000 ]", function()
-	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackbeardReward", "Reroll", "1");
-	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackbeardReward", "Reroll", "2");
+	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackkietdepzaidReward", "Reroll", "1");
+	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer("BlackkietdepzaidReward", "Reroll", "2");
 end);
 ShopTab:Seperator("Accessories");
 ShopTab:Button("Black Cape [ $50,000 ]", function()
