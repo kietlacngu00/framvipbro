@@ -2319,7 +2319,7 @@ screenGui.Parent = game.CoreGui
 local imageButton = Instance.new("ImageButton")
 imageButton.Size = UDim2.new(0, 35, 0, 35)
 imageButton.Position = UDim2.new(0.15, 0, 0.15, 0)
-imageButton.Image = "rbxassetid://18919385586"
+imageButton.Image = "rbxassetid://106113185922406"
 imageButton.BackgroundTransparency = 1
 imageButton.Parent = screenGui
 
@@ -4530,7 +4530,7 @@ local ToolAbilities = Net:WaitForChild("RF/JobToolAbilities")
 -- =========================================================
 -- CONFIGURAÇÃO DA NOTIFICAÇÃO CUSTOMIZADA (FULL BLACK)
 -- =========================================================
-local LogoID = "rbxassetid://18919385586"
+local LogoID = "rbxassetid://106113185922406"
 
 local function NotifyNightMystic(texto)
     task.spawn(function()
