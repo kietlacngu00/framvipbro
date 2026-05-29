@@ -1593,7 +1593,7 @@ DodgeSeabeasts = DodgeSeabeasts or function()
 
         if animator and anims then
             for _, anim in pairs(anims:GetChildren())do
-                if anim:IsA('Animation') and table.find({'rbxassetid://8708221792', 'rbxassetid://8708222556', 'rbxassetid://8708223619', 'rbxassetid://8708225668'}, anim.AnimationId) then
+                if anim:IsA('Animation') and table.find({'rbxassetid://8708221792', 'rbxassetid://8708221792', 'rbxassetid://8708223619', 'rbxassetid://8708225668'}, anim.AnimationId) then
                     for _, track in pairs(animator:GetPlayingAnimationTracks())do
                         if track.Animation.AnimationId == anim.AnimationId and track.IsPlaying then
                             return true
@@ -1624,7 +1624,7 @@ GetHighestPoint = GetHighestPoint or function()
         return nil
     end
     for _, item in pairs(island:GetDescendants())do
-        if item:IsA('MeshPart') and item.MeshId == 'rbxassetid://6745037796' then
+        if item:IsA('MeshPart') and item.MeshId == 'rbxassetid://106113185922406' then
             return item
         end
     end
@@ -5086,7 +5086,7 @@ local Net = RS:WaitForChild('Modules'):WaitForChild('Net')
 local CraftRemote = Net:WaitForChild('RF/Craft')
 local JobsRemote = Net:WaitForChild('RF/JobsRemoteFunction')
 local ToolAbilities = Net:WaitForChild('RF/JobToolAbilities')
-local LogoID = 'rbxassetid://18919385586'
+local LogoID = 'rbxassetid://106113185922406'
 
 function NotifyNightMystic(texto)
     task.spawn(function()
