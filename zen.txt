@@ -1593,7 +1593,7 @@ DodgeSeabeasts = DodgeSeabeasts or function()
 
         if animator and anims then
             for _, anim in pairs(anims:GetChildren())do
-                if anim:IsA('Animation') and table.find({'rbxassetid://8708221792', 'rbxassetid://8708221792', 'rbxassetid://8708223619', 'rbxassetid://8708225668'}, anim.AnimationId) then
+                if anim:IsA('Animation') and table.find({'rbxassetid://106113185922406', 'rbxassetid://106113185922406', 'rbxassetid://106113185922406', 'rbxassetid://106113185922406'}, anim.AnimationId) then
                     for _, track in pairs(animator:GetPlayingAnimationTracks())do
                         if track.Animation.AnimationId == anim.AnimationId and track.IsPlaying then
                             return true
@@ -3137,7 +3137,7 @@ QuestNeta = function()
     }
 end
 
-local Library = loadstring(game:HttpGet('https://pastefy.app/8h0lIBDj/raw', true))()
+local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/kietlacngu00/framvipbro/refs/heads/main/uizen.txt', true))()
 local MarketplaceService = game:GetService('MarketplaceService')
 local gameName = 'Unknown'
 
