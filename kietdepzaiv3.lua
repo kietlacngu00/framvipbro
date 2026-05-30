@@ -485,9 +485,9 @@ spawn(function()
 	until game:IsLoaded();
 	local ChatService = game:GetService("Chat");
 	wait(1);
-	((require(game.ReplicatedStorage.Notification)).new("<Color=Purple>[ Welcome " .. game.Players.LocalPlayer.DisplayName .. " ]<Color=/>")):Display();
+	((require(game.ReplicatedStorage.Notification)).new("<Color=Orange>[ Welcome " .. game.Players.LocalPlayer.DisplayName .. " ]<Color=/>")):Display();
 	wait(1);
-	((require(game.ReplicatedStorage.Notification)).new("<Color=Yellow>[ Huy script 🇻🇳]<Color=/>")):Display();
+	((require(game.ReplicatedStorage.Notification)).new("<Color=Orange>[ kietdepzai 🇻🇳]<Color=/>")):Display();
 end);
 function CheckQuest()
 	MyLevel = (game:GetService("Players")).LocalPlayer.Data.Level.Value;
@@ -2469,7 +2469,7 @@ spawn(function()
 	end;
 end);
 MainTab:Button("Copy Tik Tok Link", function()
-	setclipboard("https://www.tiktok.com/@huyscriptth?_r=1&_t=ZS-92qnNEgEjZZ");
+	setclipboard("...");
 	Update:Notify("Copied!", 3);
 end);
 MainTab:Seperator("Level Farm");
