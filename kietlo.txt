@@ -2639,7 +2639,7 @@ local function performClick()
     getgenv().AutoClickShootSettings.LastClickTime = currentTime
 end
 
-local bearlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/kietlacngu00/kietdepzaiUI/refs/heads/main/NewZynLib_RedOrange.txt"))()
+local bearlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/kietlacngu00/kietdepzaiUI/refs/heads/main/NewZynLibui.txt"))()
 local Window = bearlib:MakeWindow({
     Title = "kietdepzai Hub | Farm",
     SubTitle = "by kiet",
