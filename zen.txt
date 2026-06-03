@@ -3152,12 +3152,12 @@ local LibWindow = Library:Window({
     SubTitle = gameName,
     WelcomeTitle = 'kietdepzai Hub',
     Developer = {
-        Name = 'jay0050[KaiZen]',
+        Name = 'kietdepzai',
         Role = 'Script Developer',
         Avatar = 12345678,
     },
     SecondOwner = {
-        Name = 'Aaditya [Npg]',
+        Name = 'kietdepzai',
         Role = 'Script Develper',
         Avatar = 12345678,
     },
