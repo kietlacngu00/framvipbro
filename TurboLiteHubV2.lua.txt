@@ -1,4 +1,4 @@
-loadstring(game:HttpGet("https://turbolite.xyz/script/webhookv2.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/kietlacngu00/webhookv2/refs/heads/main/webhookv2.lua"))()
 
 -- Cache all services at start for better performance
 local Services = setmetatable({}, {
@@ -13,7 +13,7 @@ local Services = setmetatable({}, {
 -- SAVE SYSTEM (Optimized)
 -- ========================================
 local HttpService = Services.HttpService
-local FolderName = "Turbo Lite Hub"
+local FolderName = "kietdepzai Hub"
 local FileName = "Settings.json"
 local FullPath = FolderName .. "/" .. FileName
 
@@ -2306,9 +2306,9 @@ QuestNeta = function()
 		};
 	end;
 	local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/TurboLite/Script/refs/heads/main/xRedzLib.lua"))():MakeWindow({
-    Title = "Turbo Lite Hub",
+    Title = "kietdepzai Hub",
     SubTitle = "UI V2 | Blox Fruit",
-    SaveFolder = "turbolite.json"
+    SaveFolder = "haha"
 })
 -- Criar ScreenGui
 local screenGui = Instance.new("ScreenGui")
@@ -2319,7 +2319,7 @@ screenGui.Parent = game.CoreGui
 local imageButton = Instance.new("ImageButton")
 imageButton.Size = UDim2.new(0, 35, 0, 35)
 imageButton.Position = UDim2.new(0.15, 0, 0.15, 0)
-imageButton.Image = "rbxassetid://18919385586"
+imageButton.Image = "rbxassetid://106113185922406"
 imageButton.BackgroundTransparency = 1
 imageButton.Parent = screenGui
 
@@ -2461,10 +2461,10 @@ local Setting = Library:MakeTab({
     Icon = "rbxassetid://7734053495"
 })
 Status:AddDiscordInvite({
-    Name = "Server Discord Turbo Lite Hub",
+    Name = "Server Discord",
     Description = "join for support and update <3",
-    Logo = "rbxassetid://18919385586",
-    Invite = "https://turbolite.xyz/discord"
+    Logo = "rbxassetid://106113185922406",
+    Invite = "https://kietdepzai"
 })
 
 Shop:AddSection("Fighting Shop")
@@ -4249,7 +4249,7 @@ Setting:AddButton({
             
             -- Notificação Universal (Funciona sem a lib Fluent)
             game.StarterGui:SetCore("SendNotification", {
-                Title = "Turbo Lite Hub",
+                Title = "kietdepzai Hub",
                 Text = "Done",
                 Duration = 5
             })
@@ -4270,13 +4270,13 @@ Setting:AddButton({
             
             -- Notificação Universal
             game.StarterGui:SetCore("SendNotification", {
-                Title = "Turbo Lite Hub",
+                Title = "kietdepzai Hub",
                 Text = "Done",
                 Duration = 5
             })
         else
             game.StarterGui:SetCore("SendNotification", {
-                Title = "Turbo Lite Hub",
+                Title = "kietdepzai Hub",
                 Text = "Done",
                 Duration = 3
             })
@@ -4530,7 +4530,7 @@ local ToolAbilities = Net:WaitForChild("RF/JobToolAbilities")
 -- =========================================================
 -- CONFIGURAÇÃO DA NOTIFICAÇÃO CUSTOMIZADA (FULL BLACK)
 -- =========================================================
-local LogoID = "rbxassetid://18919385586"
+local LogoID = "rbxassetid://106113185922406"
 
 local function NotifyNightMystic(texto)
     task.spawn(function()
