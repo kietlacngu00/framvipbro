@@ -9,41 +9,12 @@ local Window = Rayfield:CreateWindow({
     ConfigurationSaving = {Enabled = false}
 })
 
--- Giả lập Window và Tab trống để code farm không bị lỗi và ẩn menu đen
-local Window = {
-    CreateTab = function() 
-        return {
-            CreateToggle = function() end,
-            CreateSlider = function() end,
-            CreateButton = function() end,
-            CreateSection = function() end
-        }
-    end
-}
-local Tab = Window:CreateTab() -- BẮT BUỘC PHẢI CÓ DÒNG NÀY ĐỂ KHÔNG BỊ LỖI
-
 _G.FastAttack = true -- Tự động bật sẵn ngầm
 _G.AttackRange = 60
 _G.HitRate = 0.1
 _G.Combo = 2
 
-Tab:CreateToggle({
-    Name = "Enable Fast Attack",
-    CurrentValue = false,
-    Callback = function(v) _G.FastAttack = v end
-})
-
-Tab:CreateSlider({
-    Name = "Attack Range",
-    Range = {20,100}, Increment = 5, CurrentValue = 60,
-    Callback = function(v) _G.AttackRange = v end
-})
-
-Tab:CreateSlider({
-    Name = "Attack Speed",
-    Range = {1,20}, Increment = 1, CurrentValue = 10,
-    Callback = function(v) _G.HitRate = 1 / v end
-})
+-- XÓA SẠCH 100% CÁC DÒNG LIÊN QUAN ĐẾN WINDOW VÀ TAB KHÔNG ĐỂ LẠI DẤU VẾT --
 
 local RS = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
@@ -78,13 +49,15 @@ task.spawn(function()
                 if (hrp.Position - root.Position).Magnitude <= _G.AttackRange then
                     if not fired then atk:FireServer(); fired = true end
                     for i = 1, _G.Combo do hit:FireServer(hrp, {{mob, hrp}}, nil, nil, id) end
-                    Combat:ApplyDamageHighlight(mob, char, weapon, hrp) -- Giữ nguyên dòng code attack của bạn
+                    
+                    -- ĐÃ XÓA BỎ DÒNG Combat:ApplyDamageHighlight TẠI ĐÂY ĐỂ TẮT ÂM THANH VÀ HIỆU ỨNG ĐIẾC TAI --
+                    
                 end
             end
         end
     end
 end)
-end) -- Giữ nguyên dấu đóng ngoặc cấu trúc tổng để không bị lỗi menu
+end) -- Dấu đóng ngoặc cấu trúc tổng của file script gốc
 -- ===== end Fast Attack =====
 
 local Y = game.Players;
