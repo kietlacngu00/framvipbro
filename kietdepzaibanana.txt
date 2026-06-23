@@ -9,10 +9,35 @@ local Window = Rayfield:CreateWindow({
     ConfigurationSaving = {Enabled = false}
 })
 
-_G.FastAttack = true -- Tự động bật Fast Attack ngầm, không cần menu nút bấm
+-- Biến Tab được gán bằng một bảng rỗng giả lập để ẩn UI đi mà không làm lỗi code phía dưới
+local Tab = {
+    CreateToggle = function() end,
+    CreateSlider = function() end
+}
+-- local Tab = Window:CreateTab("🐱 Fast Attack", 11176073582) -- Dòng gốc đã ẩn
+
+_G.FastAttack = true -- Đã sửa từ false thành true để tự động bật sẵn ngầm
 _G.AttackRange = 60
 _G.HitRate = 0.1
 _G.Combo = 2
+
+Tab:CreateToggle({
+    Name = "Enable Fast Attack",
+    CurrentValue = false,
+    Callback = function(v) _G.FastAttack = v end
+})
+
+Tab:CreateSlider({
+    Name = "Attack Range",
+    Range = {20,100}, Increment = 5, CurrentValue = 60,
+    Callback = function(v) _G.AttackRange = v end
+})
+
+Tab:CreateSlider({
+    Name = "Attack Speed",
+    Range = {1,20}, Increment = 1, CurrentValue = 10,
+    Callback = function(v) _G.HitRate = 1 / v end
+})
 
 local RS = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
@@ -47,14 +72,13 @@ task.spawn(function()
                 if (hrp.Position - root.Position).Magnitude <= _G.AttackRange then
                     if not fired then atk:FireServer(); fired = true end
                     for i = 1, _G.Combo do hit:FireServer(hrp, {{mob, hrp}}, nil, nil, id) end
-                    
-                    -- ĐÃ XÓA HIỆU ỨNG ĐÁNH (Combat:ApplyDamageHighlight) GIÚP GIẢM LAG TUYỆT ĐỐI!
-                    
+                    Combat:ApplyDamageHighlight(mob, char, weapon, hrp) -- Giữ nguyên dòng code attack của bạn
                 end
             end
         end
     end
 end)
+end) -- Giữ nguyên dấu đóng ngoặc cấu trúc tổng để không bị lỗi menu
 -- ===== end Fast Attack =====
 
 local Y = game.Players;
