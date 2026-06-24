@@ -1,64 +1,154 @@
--- ===== Fast Attack (kietdepzai) =====
-spawn(function()
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+-- ==========================================
+-- REALTIME MONITORING UI (ĐỘ TRỄ CỰC THẤP)
+-- ==========================================
 
-local Window = Rayfield:CreateWindow({
-    Name = "kietdepzai | Blox fruit",
-    LoadingTitle = "Loading...",
-    LoadingSubtitle = "by kietdepzai",
-    ConfigurationSaving = {Enabled = false}
-})
-
-_G.FastAttack = true -- Tự động bật sẵn ngầm
-_G.AttackRange = 60
-_G.HitRate = 0.1
-_G.Combo = 2
-
--- XÓA SẠCH 100% CÁC DÒNG LIÊN QUAN ĐẾN WINDOW VÀ TAB KHÔNG ĐỂ LẠI DẤU VẾT --
-
-local RS = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
-local plr = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
 
-local ok1, Net = pcall(function() return require(RS.Modules.Net) end)
-local ok2, Combat = pcall(function() return require(RS.Modules.CombatUtil) end)
-if not (ok1 and ok2) then return end
+-- Tạo Giao diện (UI)
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local InfoLabel = Instance.new("TextLabel")
+local UICorner = Instance.new("UICorner")
 
-local hit = Net:RemoteEvent("RegisterHit", true)
-local atk = RS.Modules.Net["RE/RegisterAttack"]
+ScreenGui.Name = "KaitunMonitorUI"
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
 
-local last = 0
+-- Khung nền chính
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BackgroundTransparency = 0.1
+MainFrame.Position = UDim2.new(0.02, 0, 0.2, 0) -- Nằm ở góc bên trái màn hình
+MainFrame.Size = UDim2.new(0, 280, 0, 320)
+MainFrame.Active = true
+MainFrame.Draggable = true -- Bạn có thể dùng chuột kéo bảng này đi chỗ khác nếu vướng
 
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = MainFrame
+
+-- Tiêu đề bảng
+Title.Name = "Title"
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Font = Enum.Font.SourceSansBold
+Title.Text = "📊 HỆ THỐNG GIÁM SÁT REALTIME"
+Title.TextColor3 = Color3.fromRGB(255, 215, 0)
+Title.TextSize = 16
+
+-- Nội dung thông tin
+InfoLabel.Name = "InfoLabel"
+InfoLabel.Parent = MainFrame
+InfoLabel.BackgroundTransparency = 1
+InfoLabel.Position = UDim2.new(0, 15, 0, 40)
+InfoLabel.Size = UDim2.new(1, -30, 1, -50)
+InfoLabel.Font = Enum.Font.SourceSans
+InfoLabel.TextAlignment = Enum.TextAlignment.TopLeft
+InfoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+InfoLabel.TextSize = 14
+InfoLabel.TextWrapped = true
+
+-- Tính toán thời gian treo máy
+local StartTime = os.time()
+local function formatTime(seconds)
+    local hours = math.floor(seconds / 3600)
+    local mins = math.floor((seconds % 3600) / 60)
+    local secs = seconds % 60
+    return string.format("%02d:%02d:%02d", hours, mins, secs)
+end
+
+-- Hàm lấy trạng thái Tộc (Race) và Cấp Tộc
+local function getRaceInfo()
+    local data = LocalPlayer:FindFirstChild("Data")
+    if not data then return "Không rõ", "" end
+    
+    local race = data:FindFirstChild("Race") and data.Race.Value or "Chưa rõ"
+    local version = "V1" -- Mặc định
+    
+    -- Kiểm tra các Badge hoặc thuộc tính tiến hóa tộc trong Blox Fruits
+    if LocalPlayer.Backpack:FindFirstChild("Awakening") or LocalPlayer.Character:FindFirstChild("Awakening") then
+        version = "V4"
+    elseif game:GetService("ReplicatedStorage").Remotes:FindFirstChild("Communya") then -- Check sơ bộ nâng cấp
+        version = "V3"
+    elseif data:FindFirstChild("RaceVersion") then
+        version = "V" .. tostring(data.RaceVersion.Value)
+    end
+    return race, version
+end
+
+-- Vòng lặp cập nhật dữ liệu với độ trễ cực thấp (Mỗi giây 1 lần)
 task.spawn(function()
-    while task.wait() do
-        if not _G.FastAttack then continue end
-        local char = plr.Character
-        if not char then continue end
-        local root = char:FindFirstChild("HumanoidRootPart")
-        local tool = char:FindFirstChildOfClass("Tool")
-        if not (root and tool) then continue end
-        if tick() - last < _G.HitRate then continue end
-        last = tick()
-        local weapon = Combat:GetWeaponName(tool)
-        local id = tostring(plr.UserId):sub(2,4)
-        local fired = false
-        for _, mob in ipairs(workspace.Enemies:GetChildren()) do
-            local hrp = mob:FindFirstChild("HumanoidRootPart")
-            local hum = mob:FindFirstChild("Humanoid")
-            if hrp and hum and hum.Health > 0 then
-                if (hrp.Position - root.Position).Magnitude <= _G.AttackRange then
-                    if not fired then atk:FireServer(); fired = true end
-                    for i = 1, _G.Combo do hit:FireServer(hrp, {{mob, hrp}}, nil, nil, id) end
-                    
-                    -- ĐÃ XÓA BỎ DÒNG Combat:ApplyDamageHighlight TẠI ĐÂY ĐỂ TẮT ÂM THANH VÀ HIỆU ỨNG ĐIẾC TAI --
-                    
+    while task.wait(1) do
+        pcall(function()
+            local Data = LocalPlayer:FindFirstChild("Data")
+            if not Data then return end
+
+            -- 1. Thông tin cơ bản
+            local level = Data:FindFirstChild("Level") and Data.Level.Value or 0
+            local beli = Data:FindFirstChild("Beli") and Data.Beli.Value or 0
+            local fragment = Data:FindFirstChild("Fragments") and Data.Fragments.Value or 0
+            local currentElapsedTime = os.time() - StartTime
+            
+            -- 2. Kiểm tra Trái ác quỷ đang dùng
+            local rstorage = game:GetService("ReplicatedStorage")
+            local df = LocalPlayer:FindFirstChild("Data") Ultra -- Tùy thuộc vào bản Mod/Game gốc lưu tên trái
+            local dfName = "Đang đấm tay / Chưa rõ"
+            if LocalPlayer.Character:FindFirstChildOfClass("Tool") and LocalPlayer.Character:FindFirstChildOfClass("Tool").ToolTip == "Blox Fruit" then
+                dfName = LocalPlayer.Character:FindFirstChildOfClass("Tool").Name
+            end
+
+            -- 3. Kiểm tra Kiếm, Súng, Võ (Melee) đang mang trên người
+            local melee, sword, gun = "Chưa trang bị", "Chưa trang bị", "Chưa trang bị"
+            for _, item in pairs(LocalPlayer.Character:GetChildren()) do
+                if item:IsA("Tool") then
+                    if item.ToolTip == "Melee" then melee = item.Name
+                    elseif item.ToolTip == "Sword" then sword = item.Name
+                    elseif item.ToolTip == "Gun" then gun = item.Name
+                    end
                 end
             end
-        end
+            -- Nếu không cầm trên tay, check trong túi đồ (Backpack)
+            for _, item in pairs(LocalPlayer.Backpack:GetChildren()) do
+                if item.ToolTip == "Melee" and melee == "Chưa trang bị" then melee = item.Name
+                elseif item.ToolTip == "Sword" and sword == "Chưa trang bị" then sword = item.Name
+                elseif item.ToolTip == "Gun" and gun == "Chưa trang bị" then gun = item.Name
+                end
+            end
+
+            -- 4. Kiểm tra Tộc
+            local raceName, raceVer = getRaceInfo()
+
+            -- 5. Đổ dữ liệu ra bảng hiển thị
+            InfoLabel.Text = string.format([[
+👤 Tài khoản: %s
+⏱️ Thời gian chạy: %s
+
+📈 Cấp độ (Level): %s
+💰 Tiền (Beli): %s
+💎 Mảnh (Fragment): %s
+
+🍇 Trái ác quỷ: %s
+👊 Võ học (Melee): %s
+⚔️ Kiếm (Sword): %s
+🔫 Súng (Gun): %s
+
+🧬 Chủng tộc: %s (%s)
+]], 
+                LocalPlayer.Name,
+                formatTime(currentElapsedTime),
+                string.format("%,d", level),
+                string.format("%,d", beli),
+                string.format("%,d", fragment),
+                dfName, melee, sword, gun,
+                raceName, raceVer
+            )
+        end)
     end
 end)
-end) -- Dấu đóng ngoặc cấu trúc tổng của file script gốc
--- ===== end Fast Attack =====
 
 local Y = game.Players;
 local d = Y.LocalPlayer;
