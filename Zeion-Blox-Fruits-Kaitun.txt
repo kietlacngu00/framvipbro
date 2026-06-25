@@ -7973,3 +7973,122 @@ task["spawn"](function()
 		end)
 	end
 end)
+
+
+-- ====================================================================
+-- CODE TỰ ĐỘNG TẠO AVATAR SÁT LỀ TRÁI VÀ ĐÓNG/MỞ BẢNG CHỮ
+-- ====================================================================
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- 1. TỰ ĐỘNG TÌM BẢNG CHỮ GỐC QUA HÀM SETTEXT
+local MainTextFrame = nil
+pcall(function()
+    -- Thư viện WindUI hoặc script của bạn thường tạo UI trong CoreGui hoặc PlayerGui
+    -- Đoạn này sẽ quét để tìm cái bảng chứa các dòng chữ Task1, Task2
+    for _, gui in ipairs(PlayerGui:GetChildren()) do
+        if gui:IsA("ScreenGui") and gui.Name ~= "Test_Avatar_Menu_SatLe" then
+            if gui:FindFirstChild("Task1", true) or gui:FindFirstChild("MainStatus", true) then
+                -- Tìm ngược lên để lấy cái Frame chính chứa các chữ này
+                local target = gui:FindFirstChild("Task1", true) or gui:FindFirstChild("MainStatus", true)
+                if target then
+                    MainTextFrame = target.Parent
+                    if MainTextFrame:IsA("Frame") == false and MainTextFrame.Parent:IsA("Frame") then
+                        MainTextFrame = MainTextFrame.Parent
+                    end
+                end
+                break
+            end
+        end
+    end
+end)
+
+-- Nếu quét tự động không ra, bạn hãy điền tên cái Frame chính vào đây (Mặc định quét tự động)
+if not MainTextFrame then
+    -- Dự phòng nếu UI nằm trong khung CoreGui của game hách
+    local CoreGui = game:GetService("CoreGui")
+    for _, gui in ipairs(CoreGui:GetChildren()) do
+        if gui:IsA("ScreenGui") then
+            local target = gui:FindFirstChild("Task1", true)
+            if target then
+                MainTextFrame = target.Parent
+                if MainTextFrame:IsA("Frame") == false and MainTextFrame.Parent:IsA("Frame") then
+                    MainTextFrame = MainTextFrame.Parent
+                end
+                break
+            end
+        end
+    end
+end
+
+-- 2. TẠO NÚT AVATAR SÁT RẠT LỀ TRÁI (CHÍNH GIỮA THEO CHIỀU DỌC)
+local AvatarGui = PlayerGui:FindFirstChild("Avatar_Toggle_Gui")
+if AvatarGui then AvatarGui:Destroy() end
+
+AvatarGui = Instance.new("ScreenGui")
+AvatarGui.Name = "Avatar_Toggle_Gui"
+AvatarGui.ResetOnSpawn = false
+AvatarGui.DisplayOrder = 999 -- Đảm bảo luôn hiện trên cùng
+AvatarGui.Parent = PlayerGui
+
+local AvatarButton = Instance.new("ImageButton")
+AvatarButton.Size = UDim2.new(0, 55, 0, 55) -- Kích thước nút avatar
+AvatarButton.Position = UDim2.new(0, 5, 0.5, -27) -- Sát rạt mép trái, giữa màn hình
+AvatarButton.Image = "rbxassetid://106113185922406" -- ID ảnh của bạn
+AvatarButton.BackgroundTransparency = 1
+AvatarButton.Draggable = false -- Cố định không di chuyển
+AvatarButton.Parent = AvatarGui
+
+local UIAvatarCorner = Instance.new("UICorner")
+UIAvatarCorner.CornerRadius = UDim.new(1, 0) -- Bo tròn thành hình tròn
+UIAvatarCorner.Parent = AvatarButton
+
+-- 3. LOGIC XOAY 1 VÒNG VÀ ĐÓNG/MỞ CHỮ (KHÔNG MENU PHỤ)
+local isHidden = false
+local isTweening = false
+
+AvatarButton.MouseButton1Click:Connect(function()
+    if isTweening then return end
+    
+    -- Nếu lúc đầu chưa quét được bảng chữ, bấm nút sẽ quét lại một lần nữa cho chắc
+    if not MainTextFrame then
+        pcall(function()
+            for _, gui in ipairs(PlayerGui:GetChildren()) do
+                local t = gui:FindFirstChild("Task1", true) or gui:FindFirstChild("MainStatus", true)
+                if t then MainTextFrame = t.Parent break end
+            end
+            if not MainTextFrame then
+                for _, gui in ipairs(game:GetService("CoreGui"):GetChildren()) do
+                    local t = gui:FindFirstChild("Task1", true) or gui:FindFirstChild("MainStatus", true)
+                    if t then MainTextFrame = t.Parent break end
+                end
+            end
+        end)
+    end
+
+    isTweening = true
+    
+    -- Hiệu ứng xoay tròn đúng 1 vòng
+    AvatarButton.Rotation = 0
+    local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(AvatarButton, tweenInfo, {Rotation = 360})
+    tween:Play()
+    
+    tween.Completed:Connect(function()
+        AvatarButton.Rotation = 0
+        isTweening = false
+    end)
+    
+    -- Chỉ thực hiện đóng/mở bảng chữ gốc, không thêm thắt gì khác
+    if MainTextFrame then
+        if not isHidden then
+            MainTextFrame.Visible = false
+            isHidden = true
+        else
+            MainTextFrame.Visible = true
+            isHidden = false
+        end
+    end
+end)
