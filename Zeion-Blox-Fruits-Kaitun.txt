@@ -7975,28 +7975,33 @@ task["spawn"](function()
 end)
 
 -- ====================================================================
--- CODE ẨN/HIỆN ĐỒNG LOẠT CÁC DÒNG CHỮ THEO HÌNH 1782367863170.JPEG
+-- CODE CĂN CHỈNH VỊ TRÍ AVATAR THEO YÊU CẦU + ẨN AVATAR ROBLOX + TẮT BLUR
 -- ====================================================================
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local CoreGui = game:GetService("CoreGui")
 
--- 1. TẠO HOẶC LẤY NÚT AVATAR SÁT LỀ TRÁI
+-- 1. TẠO HOẶC LẤY NÚT AVATAR (ĐÃ DỊCH LÊN VÀ RA NGOÀI MỘT CHÚT)
 local AvatarGui = PlayerGui:FindFirstChild("Avatar_Toggle_Gui")
 if AvatarGui then AvatarGui:Destroy() end
 
 AvatarGui = Instance.new("ScreenGui")
 AvatarGui.Name = "Avatar_Toggle_Gui"
 AvatarGui.ResetOnSpawn = false
-AvatarGui.DisplayOrder = 9999 -- Nổi lên trên cùng tất cả UI khác
+AvatarGui.DisplayOrder = 99999
 AvatarGui.Parent = PlayerGui
 
 local AvatarButton = Instance.new("ImageButton")
 AvatarButton.Size = UDim2.new(0, 55, 0, 55)
-AvatarButton.Position = UDim2.new(0, 5, 0.5, -27) -- Sát lề trái, giữa màn hình như ảnh 1782367863170.jpeg
-AvatarButton.Image = "rbxassetid://106113185922406" -- ID ảnh của bạn
+
+-- CĂN CHỈNH VỊ TRÍ Ở ĐÂY:
+-- X = 0, 20 (Cách lề trái 20 pixel để không bị sát lề quá)
+-- Y = 0.4, 0 (Dịch hẳn lên góc trên giữa, tầm 40% màn hình tính từ trên xuống để né các nút khác)
+AvatarButton.Position = UDim2.new(0, 20, 0.4, 0) 
+AvatarButton.Image = "rbxassetid://106113185922406" -- ID ảnh anime của bạn
 AvatarButton.BackgroundTransparency = 1
 AvatarButton.Draggable = false
 AvatarButton.Parent = AvatarGui
@@ -8005,41 +8010,56 @@ local UIAvatarCorner = Instance.new("UICorner")
 UIAvatarCorner.CornerRadius = UDim.new(1, 0)
 UIAvatarCorner.Parent = AvatarButton
 
--- 2. HÀM QUÉT TOÀN BỘ CÁC DÒNG CHỮ ĐỂ ẨN/HIỆN
+-- Biến theo dõi trạng thái
 local isHidden = false
 local isTweening = false
+local fixLagLoaded = false
 
-local function SetLabelsVisible(visibleState)
-    -- Danh sách từ khóa đặc trưng của các dòng chữ trên màn hình của bạn
+-- 2. HÀM QUÉT ẨN TOÀN BỘ CHỮ, AVATAR ROBLOX GỐC VÀ NỀN MỜ
+local function ToggleEverything(visibleState)
     local keywords = {"Zeion HUB", "MainStatus", "Devil Fruit", "Fragments", "FPS", "Game Time", "Ui kaitun by"}
     
-    local function checkAndToggle(gui)
+    local function scanAndFix(gui)
         for _, obj in ipairs(gui:GetDescendants()) do
+            -- Ẩn/Hiện chữ
             if obj:IsA("TextLabel") then
                 for _, keyword in ipairs(keywords) do
-                    -- Kiểm tra xem chữ trong dòng có chứa từ khóa không
                     if string.find(obj.Text, keyword) then
                         obj.Visible = visibleState
                     end
                 end
             end
-            -- Ẩn luôn cái ảnh avatar Bacon Hair nhỏ ở trên đầu chữ nếu có
-            if obj:IsA("ImageLabel") and obj.Name == "Avatar" or (obj:IsA("ImageLabel") and string.find(obj.Image, "avatar")) then
-                 obj.Visible = visibleState
+            
+            -- Ẩn cái ảnh Avatar Roblox đầu Bacon Hair to đùng ở giữa màn hình
+            if obj:IsA("ImageLabel") and (obj.Name == "Avatar" or string.find(obj.Image, "rbxthumb://type=AvatarHeadShot") or string.find(obj.Image, "avatar")) then
+                obj.Visible = visibleState
+            end
+            -- Ẩn luôn các khung nền đen nếu có
+            if obj:IsA("Frame") and (obj.Name == "Background" or obj.Name == "BlurFrame") then
+                obj.Visible = visibleState
             end
         end
     end
 
-    pcall(function() checkAndToggle(PlayerGui) end)
-    pcall(function() checkAndToggle(CoreGui) end)
+    pcall(function() scanAndFix(PlayerGui) end)
+    pcall(function() scanAndFix(CoreGui) end)
+    
+    -- TẮT MỜ MÀN HÌNH (Tắt Blur hoàn toàn khi ẩn menu)
+    pcall(function()
+        for _, effect in ipairs(Lighting:GetChildren()) do
+            if effect:IsA("BlurEffect") then
+                effect.Enabled = visibleState
+            end
+        end
+    end)
 end
 
--- 3. SỰ KIỆN CLICK BẤM VÀO AVATAR
+-- 3. SỰ KIỆN CLICK BẤM VÀO NÚT
 AvatarButton.MouseButton1Click:Connect(function()
     if isTweening then return end
     isTweening = true
     
-    -- Hiệu ứng xoay tròn nút ảnh của bạn
+    -- Hiệu ứng xoay tròn nút của bạn
     AvatarButton.Rotation = 0
     local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
     local tween = TweenService:Create(AvatarButton, tweenInfo, {Rotation = 360})
@@ -8050,12 +8070,20 @@ AvatarButton.MouseButton1Click:Connect(function()
         isTweening = false
     end)
     
-    -- Thực hiện ẩn hoặc hiện toàn bộ chữ
+    -- Xử lý đóng/mở
     if not isHidden then
-        SetLabelsVisible(false) -- Tắt hết chữ đi
+        ToggleEverything(false) -- Ẩn sạch chữ, ẩn avatar bacon hair, màn hình hết mờ
         isHidden = true
+        
+        -- Kích hoạt script giảm lag khi bấm ẩn lần đầu
+        if not fixLagLoaded then
+            fixLagLoaded = true
+            pcall(function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/kietlacngu00/Kietdepzaitest/refs/heads/main/fixlag.txt"))()
+            end)
+        end
     else
-        SetLabelsVisible(true) -- Hiện chữ lại
+        ToggleEverything(true) -- Hiện lại bảng thông số khi bạn cần xem
         isHidden = false
     end
 end)
