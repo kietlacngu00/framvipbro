@@ -95,7 +95,7 @@ task.spawn(function()
             
             -- 2. Kiểm tra Trái ác quỷ đang dùng
             local rstorage = game:GetService("ReplicatedStorage")
-            local df = LocalPlayer:FindFirstChild("Data") Ultra -- Tùy thuộc vào bản Mod/Game gốc lưu tên trái
+            local df = LocalPlayer:FindFirstChild("Data")  --Tùy thuộc vào bản Mod/Game gốc lưu tên trái
             local dfName = "Đang đấm tay / Chưa rõ"
             if LocalPlayer.Character:FindFirstChildOfClass("Tool") and LocalPlayer.Character:FindFirstChildOfClass("Tool").ToolTip == "Blox Fruit" then
                 dfName = LocalPlayer.Character:FindFirstChildOfClass("Tool").Name
