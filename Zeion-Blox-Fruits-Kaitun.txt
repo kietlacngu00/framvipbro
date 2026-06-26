@@ -7974,116 +7974,221 @@ task["spawn"](function()
 	end
 end)
 
--- ====================================================================
--- CODE CĂN CHỈNH VỊ TRÍ AVATAR THEO YÊU CẦU + ẨN AVATAR ROBLOX + TẮT BLUR
--- ====================================================================
-local TweenService = game:GetService("TweenService")
+-- ========================================================
+-- SCRIPT AUTO KAITUN - TÍCH HỢP CHỐNG LAG & TẮT MENU CHỮ
+-- ========================================================
+
+if not game:IsLoaded() then
+    repeat game.Loaded:Wait() until game:IsLoaded()
+end
+
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-local CoreGui = game:GetService("CoreGui")
 
--- 1. TẠO HOẶC LẤY NÚT AVATAR (ĐÃ DỊCH LÊN VÀ RA NGOÀI MỘT CHÚT)
-local AvatarGui = PlayerGui:FindFirstChild("Avatar_Toggle_Gui")
-if AvatarGui then AvatarGui:Destroy() end
-
-AvatarGui = Instance.new("ScreenGui")
-AvatarGui.Name = "Avatar_Toggle_Gui"
-AvatarGui.ResetOnSpawn = false
-AvatarGui.DisplayOrder = 99999
-AvatarGui.Parent = PlayerGui
-
-local AvatarButton = Instance.new("ImageButton")
-AvatarButton.Size = UDim2.new(0, 55, 0, 55)
-
--- CĂN CHỈNH VỊ TRÍ Ở ĐÂY:
--- X = 0, 20 (Cách lề trái 20 pixel để không bị sát lề quá)
--- Y = 0.4, 0 (Dịch hẳn lên góc trên giữa, tầm 40% màn hình tính từ trên xuống để né các nút khác)
-AvatarButton.Position = UDim2.new(0, 20, 0.4, 0) 
-AvatarButton.Image = "rbxassetid://106113185922406" -- ID ảnh anime của bạn
-AvatarButton.BackgroundTransparency = 1
-AvatarButton.Draggable = false
-AvatarButton.Parent = AvatarGui
-
-local UIAvatarCorner = Instance.new("UICorner")
-UIAvatarCorner.CornerRadius = UDim.new(1, 0)
-UIAvatarCorner.Parent = AvatarButton
-
--- Biến theo dõi trạng thái
-local isHidden = false
-local isTweening = false
-local fixLagLoaded = false
-
--- 2. HÀM QUÉT ẨN TOÀN BỘ CHỮ, AVATAR ROBLOX GỐC VÀ NỀN MỜ
-local function ToggleEverything(visibleState)
-    local keywords = {"Zeion HUB", "MainStatus", "Devil Fruit", "Fragments", "FPS", "Game Time", "Ui kaitun by"}
-    
-    local function scanAndFix(gui)
-        for _, obj in ipairs(gui:GetDescendants()) do
-            -- Ẩn/Hiện chữ
-            if obj:IsA("TextLabel") then
-                for _, keyword in ipairs(keywords) do
-                    if string.find(obj.Text, keyword) then
-                        obj.Visible = visibleState
-                    end
-                end
-            end
-            
-            -- Ẩn cái ảnh Avatar Roblox đầu Bacon Hair to đùng ở giữa màn hình
-            if obj:IsA("ImageLabel") and (obj.Name == "Avatar" or string.find(obj.Image, "rbxthumb://type=AvatarHeadShot") or string.find(obj.Image, "avatar")) then
-                obj.Visible = visibleState
-            end
-            -- Ẩn luôn các khung nền đen nếu có
-            if obj:IsA("Frame") and (obj.Name == "Background" or obj.Name == "BlurFrame") then
-                obj.Visible = visibleState
+-- ========================================================
+-- 1. CHỨC NĂNG LÀM SÁNG ĐỒ HỌA + CHỐNG LAG (FPS BOOSTER)
+-- ========================================================
+local function KichHoatChongLagLamSang()
+    pcall(function()
+        -- Thiết lập môi trường ánh sáng (Làm sáng bản đồ)
+        Lighting.GlobalShadows = false
+        Lighting.FogEnd = 9000000000
+        Lighting.Brightness = 2 -- Tăng độ sáng môi trường lên rõ rệt
+        
+        -- Tối ưu chất lượng Rendering về mức thấp nhất để tăng FPS
+        if settings() and settings():GetService("Rendering") then
+            settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+        end
+        
+        -- Ép các hiệu ứng làm mờ, mù mắt, đổ bóng hoạt động bằng 0
+        for _, effect in pairs(Lighting:GetDescendants()) do
+            if effect:IsA("BlurEffect") or effect:IsA("SunRaysEffect") or effect:IsA("ColorCorrectionEffect") or effect:IsA("BloomEffect") or effect:IsA("DepthOfFieldEffect") then
+                effect.Enabled = false
             end
         end
-    end
 
-    pcall(function() scanAndFix(PlayerGui) end)
-    pcall(function() scanAndFix(CoreGui) end)
-    
-    -- TẮT MỜ MÀN HÌNH (Tắt Blur hoàn toàn khi ẩn menu)
-    pcall(function()
-        for _, effect in ipairs(Lighting:GetChildren()) do
-            if effect:IsA("BlurEffect") then
-                effect.Enabled = visibleState
+        -- Biến đổi toàn bộ Texture, vật liệu nặng thành nhựa (Plastic) phẳng để chống lag
+        for _, object in pairs(workspace:GetDescendants()) do
+            if object:IsA("BasePart") or object:IsA("MeshPart") then
+                object.Material = Enum.Material.Plastic
+                object.Reflectance = 0
+                object.CastShadow = false
+                if object:IsA("MeshPart") then
+                    object.TextureID = ""
+                    object.RenderFidelity = Enum.RenderFidelity.Performance
+                end
+            elseif object:IsA("Decal") or object:IsA("Texture") then
+                object.Transparency = 1
+            elseif object:IsA("ParticleEmitter") or object:IsA("Trail") then
+                object.Enabled = false
+            elseif object:IsA("Fire") or object:IsA("Smoke") or object:IsA("Sparkles") then
+                object.Enabled = false
             end
+        end
+        
+        -- Tắt sóng biển vật lý
+        if workspace:FindFirstChildOfClass("Terrain") then
+            local terrain = workspace:FindFirstChildOfClass("Terrain")
+            terrain.WaterWaveSize = 0
+            terrain.WaterWaveSpeed = 0
+            terrain.WaterReflectance = 0
+            terrain.WaterTransparency = 0
         end
     end)
 end
 
--- 3. SỰ KIỆN CLICK BẤM VÀO NÚT
-AvatarButton.MouseButton1Click:Connect(function()
-    if isTweening then return end
-    isTweening = true
+-- Chạy tự động tính năng làm sáng & giảm lag
+KichHoatChongLagLamSang()
+
+
+-- ========================================================
+-- 2. KHỞI TẠO MENU CHỮ (7-LINES UI) & NÚT TẮT CHỮ
+-- ========================================================
+if game:GetService("CoreGui"):FindFirstChild("ZeionKaitunUI") then
+    game:GetService("CoreGui").ZeionKaitunUI:Destroy()
+end
+
+local ScreenGui = Instance.new('ScreenGui')
+ScreenGui.Name = "ZeionKaitunUI"
+ScreenGui.Parent = game:GetService('CoreGui')
+ScreenGui.IgnoreGuiInset = true
+
+-- Khung chứa toàn bộ phần chữ thông tin để dễ dàng Ẩn/Hiện
+local ContentFrame = Instance.new("Frame")
+ContentFrame.Name = "ContentFrame"
+ContentFrame.Parent = ScreenGui
+ContentFrame.BackgroundTransparency = 1
+ContentFrame.Size = UDim2.new(1, 0, 1, 0)
+ContentFrame.Visible = true -- Mặc định là hiện chữ
+
+-- Avatar nhân vật ở giữa màn hình
+local AvatarImage = Instance.new('ImageLabel')
+AvatarImage.Name = 'AvatarImage'
+AvatarImage.Parent = ContentFrame
+AvatarImage.AnchorPoint = Vector2.new(0.5, 0.5)
+AvatarImage.Position = UDim2.new(0.5, 0, 0.24, 0)
+AvatarImage.Size = UDim2.new(0, 60, 0, 60)
+AvatarImage.BackgroundTransparency = 1
+AvatarImage.Image = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+
+local Corner = Instance.new("UICorner")
+Corner.Parent = AvatarImage
+Corner.CornerRadius = UDim.new(1, 0)
+
+-- Tạo cấu trúc lưu các dòng chữ
+local Library = {}
+local function TaoDongChu(name, position)
+    local Label = Instance.new('TextLabel')
+    Label.Name = name
+    Label.Parent = ContentFrame
+    Label.AnchorPoint = Vector2.new(0.5, 0.5)
+    Label.Position = position
+    Label.Size = UDim2.new(0, 600, 0, 30)
+    Label.BackgroundTransparency = 1
+    Label.Font = Enum.Font.FredokaOne
+    Label.Text = "..."
+    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Label.TextSize = 13
+    Label.RichText = true
     
-    -- Hiệu ứng xoay tròn nút của bạn
-    AvatarButton.Rotation = 0
-    local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    local tween = TweenService:Create(AvatarButton, tweenInfo, {Rotation = 360})
+    local Stroke = Instance.new("UIStroke")
+    Stroke.Parent = Label
+    Stroke.Color = Color3.fromRGB(0, 0, 0)
+    Stroke.Thickness = 1
+    
+    Library[name] = Label
+    return Label
+end
+
+-- Khởi tạo chính xác 7 dòng hiển thị thông tin
+local DanhSachDongChu = {'NameHub', 'Task1', 'Task2', 'Currencies', 'Melees', 'DebugLine', 'Credit'}
+for i, line in pairs(DanhSachDongChu) do
+    TaoDongChu(line, UDim2.new(0.5, 0, 0.30 + (.045 * i), 0))
+end
+
+-- Hàm cập nhật nội dung chữ nhanh chóng
+local function GanChu(name, text)
+    if Library[name] then Library[name].Text = text end
+end
+
+GanChu("NameHub", "<font color='#3b82f6'>!!</font> Zeion HUB | Kaitun Script <font color='#3b82f6'>!!</font>")
+GanChu("Credit", "<font color='#ef4444'>!!</font> Ui kaitun by i.m_dog <font color='#ef4444'>!!</font>")
+
+-- Hiệu ứng mờ màn hình nhẹ phía sau chữ
+local BlurEffect = Instance.new("BlurEffect")
+BlurEffect.Name = "MeowHubBlur"
+BlurEffect.Parent = Lighting
+BlurEffect.Size = 12
+
+
+-- ========================================================
+-- 3. NÚT TRANH ẢNH HOẶC NÚT LOGO ĐỂ TẮT/MỞ TOÀN BỘ CHỮ
+-- ========================================================
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Parent = ScreenGui
+ToggleButton.Size = UDim2.new(0, 50, 0, 50)
+ToggleButton.Position = UDim2.new(0.02, 0, 0.05, 0) -- Nằm ở góc trên bên trái màn hình
+ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleButton.Text = "👁️" -- Icon bật/tắt mắt
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 20
+
+local ButtonCorner = Instance.new("UICorner")
+ButtonCorner.CornerRadius = UDim.new(0, 10)
+ButtonCorner.Parent = ToggleButton
+
+-- Trạng thái ẩn/hiện chữ
+local DangAnChu = false
+
+ToggleButton.MouseButton1Click:Connect(function()
+    DangAnChu = not DangAnChu
+    
+    -- Hiệu ứng xoay nút khi bấm
+    ToggleButton.Rotation = 0
+    local tween = TweenService:Create(ToggleButton, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Rotation = DangAnChu and 180 or 0})
     tween:Play()
     
-    tween.Completed:Connect(function()
-        AvatarButton.Rotation = 0
-        isTweening = false
-    end)
+    -- Xử lý ẩn/hiện toàn bộ menu chữ cùng lúc
+    ContentFrame.Visible = not DangAnChu
+    BlurEffect.Enabled = not DangAnChu
     
-    -- Xử lý đóng/mở
-    if not isHidden then
-        ToggleEverything(false) -- Ẩn sạch chữ, ẩn avatar bacon hair, màn hình hết mờ
-        isHidden = true
-        
-        -- Kích hoạt script giảm lag khi bấm ẩn lần đầu
-        if not fixLagLoaded then
-            fixLagLoaded = true
-            pcall(function()
-                loadstring(game:HttpGet("https://raw.githubusercontent.com/kietlacngu00/Kietdepzaitest/refs/heads/main/fixlag.txt"))()
-            end)
-        end
+    if DangAnChu then
+        ToggleButton.Text = "❌" -- Khi tắt chữ, nút hiển thị dấu X để bật lại
     else
-        ToggleEverything(true) -- Hiện lại bảng thông số khi bạn cần xem
-        isHidden = false
+        ToggleButton.Text = "👁️" -- Khi bật lại chữ, nút quay về hình con mắt
+    end
+end)
+
+
+-- ========================================================
+-- VÒNG LẶP CẬP NHẬT THÔNG TIN REALTIME CỦA GAME
+-- ========================================================
+task.spawn(function()
+    while task.wait(1) do
+        pcall(function()
+            -- Cập nhật dữ liệu game (Beli, Level, Trái ác quỷ...)
+            local level = LocalPlayer.Data.Level.Value
+            local beli = LocalPlayer.Data.Beli.Value
+            local fragments = LocalPlayer.Data.Fragments.Value
+            local race = LocalPlayer.Data.Race.Value
+            local dfValue = LocalPlayer.Data.DevilFruit.Value
+            local dfText = (dfValue == "" or dfValue == "None") and "None" or dfValue
+            
+            -- Tính toán FPS & Ping cơ bản
+            local fps = math.floor(Stats.Workspace.Heartbeat:GetValue())
+            local ping = string.format("%.0fms", LocalPlayer:GetNetworkPing() * 1000)
+            
+            -- Đổ dữ liệu vào UI
+            GanChu("Task1", "MainStatus : <font color='#a855f7'>Farming...</font>")
+            GanChu("Task2", "Devil Fruit : <font color='#f43f5e'>" .. dfText .. "</font>")
+            GanChu("Currencies", "<font color='#a855f7'>Fragments</font>: " .. fragments .. " | <font color='#facc15'>Beli</font>: " .. beli .. " | <font color='#22c55e'>Lv</font>: " .. level)
+            GanChu("Melees", "FPS: <font color='#22c55e'>" .. fps .. "</font> | Ping: <font color='#ec4899'>" .. ping .. "</font> | เผ่า: <font color='#3b82f6'>" .. race .. "</font>")
+            
+            local gameTime = math.floor(workspace.DistributedGameTime + 0.5)
+            GanChu("DebugLine", "Game Time: " .. string.format("%02d:%02d:%02d", math.floor(gameTime / 3600) % 24, math.floor(gameTime / 60) % 60, gameTime % 60))
+        end)
     end
 end)
