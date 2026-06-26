@@ -1,10 +1,19 @@
 -- ==========================================
--- REALTIME MONITORING UI (ĐỘ TRỄ CỰC THẤP)
+-- REALTIME MONITORING UI (ĐÃ SỬA LỖI HIỂN THỊ)
 -- ==========================================
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
+
+-- Chờ cho đến khi PlayerGui có sẵn để tránh lỗi load chậm
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui", 10)
+if not PlayerGui then return end
+
+-- Xóa UI cũ nếu có chạy lại script để tránh đè giao diện
+if PlayerGui:FindFirstChild("KaitunMonitorUI") then
+    PlayerGui.KaitunMonitorUI:Destroy()
+end
 
 -- Tạo Giao diện (UI)
 local ScreenGui = Instance.new("ScreenGui")
@@ -14,18 +23,18 @@ local InfoLabel = Instance.new("TextLabel")
 local UICorner = Instance.new("UICorner")
 
 ScreenGui.Name = "KaitunMonitorUI"
-ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.Parent = PlayerGui
 ScreenGui.ResetOnSpawn = false
 
 -- Khung nền chính
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-MainFrame.BackgroundTransparency = 0.1
+MainFrame.BackgroundTransparency = 0.15
 MainFrame.Position = UDim2.new(0.02, 0, 0.2, 0) -- Nằm ở góc bên trái màn hình
 MainFrame.Size = UDim2.new(0, 280, 0, 320)
 MainFrame.Active = true
-MainFrame.Draggable = true -- Bạn có thể dùng chuột kéo bảng này đi chỗ khác nếu vướng
+MainFrame.Draggable = true -- Có thể giữ chuột kéo đi nơi khác
 
 UICorner.CornerRadius = UDim.new(0, 10)
 UICorner.Parent = MainFrame
@@ -44,10 +53,12 @@ Title.TextSize = 16
 InfoLabel.Name = "InfoLabel"
 InfoLabel.Parent = MainFrame
 InfoLabel.BackgroundTransparency = 1
-InfoLabel.Position = UDim2.new(0, 15, 0, 40)
-InfoLabel.Size = UDim2.new(1, -30, 1, -50)
+InfoLabel.Position = UDim2.new(0, 15, 0, 45)
+InfoLabel.Size = UDim2.new(1, -30, 1, -55)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.TextAlignment = Enum.TextAlignment.TopLeft
+-- SỬA LỖI: Đổi TextAlignment thành TextXAlignment và TextYAlignment đúng chuẩn Roblox
+InfoLabel.TextXAlignment = Enum.TextXAlignment.Left
+InfoLabel.TextYAlignment = Enum.TextYAlignment.Top
 InfoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 InfoLabel.TextSize = 14
 InfoLabel.TextWrapped = true
@@ -61,18 +72,17 @@ local function formatTime(seconds)
     return string.format("%02d:%02d:%02d", hours, mins, secs)
 end
 
--- Hàm lấy trạng thái Tộc (Race) và Cấp Tộc
+-- Hàm lấy trạng thái Tộc (Race) và Cấp Tộc bảo mật không crash
 local function getRaceInfo()
     local data = LocalPlayer:FindFirstChild("Data")
-    if not data then return "Không rõ", "" end
+    if not data then return "Đang tải...", "" end
     
     local race = data:FindFirstChild("Race") and data.Race.Value or "Chưa rõ"
-    local version = "V1" -- Mặc định
+    local version = "V1"
     
-    -- Kiểm tra các Badge hoặc thuộc tính tiến hóa tộc trong Blox Fruits
-    if LocalPlayer.Backpack:FindFirstChild("Awakening") or LocalPlayer.Character:FindFirstChild("Awakening") then
+    if LocalPlayer.Backpack:FindFirstChild("Awakening") or (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Awakening")) then
         version = "V4"
-    elseif game:GetService("ReplicatedStorage").Remotes:FindFirstChild("Communya") then -- Check sơ bộ nâng cấp
+    elseif game:GetService("ReplicatedStorage"):FindFirstChild("Remotes") and game:GetService("ReplicatedStorage").Remotes:FindFirstChild("Communya") then
         version = "V3"
     elseif data:FindFirstChild("RaceVersion") then
         version = "V" .. tostring(data.RaceVersion.Value)
@@ -80,12 +90,16 @@ local function getRaceInfo()
     return race, version
 end
 
--- Vòng lặp cập nhật dữ liệu với độ trễ cực thấp (Mỗi giây 1 lần)
+-- Vòng lặp cập nhật dữ liệu liên tục
 task.spawn(function()
     while task.wait(1) do
         pcall(function()
             local Data = LocalPlayer:FindFirstChild("Data")
-            if not Data then return end
+            -- SỬA LỖI: Dùng 'continue' thay vì 'return' để nếu chưa load xong Data thì giây sau check tiếp chứ không làm chết hẳn script
+            if not Data then 
+                InfoLabel.Text = "⏳ Đang đợi game tải dữ liệu nhân vật..."
+                return 
+            end
 
             -- 1. Thông tin cơ bản
             local level = Data:FindFirstChild("Level") and Data.Level.Value or 0
@@ -93,25 +107,32 @@ task.spawn(function()
             local fragment = Data:FindFirstChild("Fragments") and Data.Fragments.Value or 0
             local currentElapsedTime = os.time() - StartTime
             
-            -- 2. Kiểm tra Trái ác quỷ đang dùng
-            local rstorage = game:GetService("ReplicatedStorage")
-            local df = LocalPlayer:FindFirstChild("Data")  --Tùy thuộc vào bản Mod/Game gốc lưu tên trái
+            -- 2. Kiểm tra Trái ác quỷ đang cầm hoặc đang dùng
             local dfName = "Đang đấm tay / Chưa rõ"
-            if LocalPlayer.Character:FindFirstChildOfClass("Tool") and LocalPlayer.Character:FindFirstChildOfClass("Tool").ToolTip == "Blox Fruit" then
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Tool") and LocalPlayer.Character:FindFirstChildOfClass("Tool").ToolTip == "Blox Fruit" then
                 dfName = LocalPlayer.Character:FindFirstChildOfClass("Tool").Name
+            else
+                -- Check thử trong data của game Blox Fruit xem có lưu tên trái không
+                local sFruit = Data:FindFirstChild("DevilFruit") or Data:FindFirstChild("Fruit")
+                if sFruit and sFruit.Value ~= "" then
+                    dfName = sFruit.Value
+                end
             end
 
-            -- 3. Kiểm tra Kiếm, Súng, Võ (Melee) đang mang trên người
+            -- 3. Kiểm tra Kiếm, Súng, Võ (Melee)
             local melee, sword, gun = "Chưa trang bị", "Chưa trang bị", "Chưa trang bị"
-            for _, item in pairs(LocalPlayer.Character:GetChildren()) do
-                if item:IsA("Tool") then
-                    if item.ToolTip == "Melee" then melee = item.Name
-                    elseif item.ToolTip == "Sword" then sword = item.Name
-                    elseif item.ToolTip == "Gun" then gun = item.Name
+            
+            if LocalPlayer.Character then
+                for _, item in pairs(LocalPlayer.Character:GetChildren()) do
+                    if item:IsA("Tool") then
+                        if item.ToolTip == "Melee" then melee = item.Name
+                        elseif item.ToolTip == "Sword" then sword = item.Name
+                        elseif item.ToolTip == "Gun" then gun = item.Name
+                        end
                     end
                 end
             end
-            -- Nếu không cầm trên tay, check trong túi đồ (Backpack)
+            
             for _, item in pairs(LocalPlayer.Backpack:GetChildren()) do
                 if item.ToolTip == "Melee" and melee == "Chưa trang bị" then melee = item.Name
                 elseif item.ToolTip == "Sword" and sword == "Chưa trang bị" then sword = item.Name
@@ -122,7 +143,7 @@ task.spawn(function()
             -- 4. Kiểm tra Tộc
             local raceName, raceVer = getRaceInfo()
 
-            -- 5. Đổ dữ liệu ra bảng hiển thị
+            -- 5. Đổ dữ liệu ra bảng hiển thị trực quan
             InfoLabel.Text = string.format([[
 👤 Tài khoản: %s
 ⏱️ Thời gian chạy: %s
